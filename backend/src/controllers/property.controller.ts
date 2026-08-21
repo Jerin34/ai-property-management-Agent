@@ -1,5 +1,5 @@
 import type {Request,Response} from 'express';
-import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService} from '../services/property.service.js';
+import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService} from '../services/property.service.js';
 import {ROLES} from '../constants/roles.js'
 import { success } from 'zod';
 export const create  =  async(req:Request,res:Response): Promise<void>=>{
@@ -127,3 +127,52 @@ export const updateProperty =async (req:Request,res:Response):Promise<void> =>{
         });
     }
 };
+export const deactivateProperty =async (req:Request,res:Response):Promise<void> =>{
+    try{
+        const user = req.user;
+        if(!user){
+            res.status(401).json({
+                success:false,
+                message:"Authentication Required"
+            })
+              return ;
+        }
+            const propertyId = req.params.id.toString();
+            const property = await getPropertyByIdService(propertyId)
+            if (
+            user.role !== ROLES.Admin &&
+            property.manager.toString() !== user.userId
+        ) {
+            res.status(403).json({
+                success: false,
+                message: "You are not allowed to deactivate this Property"
+            });
+            return;
+        }
+      const deactivatedProperty = await deactivatePropertyService(propertyId);
+              res.status(200).json({
+            success: true,
+            message: "Property deactivated successfully",
+            data:deactivatedProperty
+        });
+    }
+    catch (err) {
+        if (
+            err instanceof Error &&
+            err.message === "Property not found"
+        ) {
+            res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+            return;
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+
+
+}

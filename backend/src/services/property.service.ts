@@ -33,3 +33,19 @@ export const updateProperty = async (propertyId:string,data:updatePropertyInput)
     return property;
 
 }
+export const deactivateProperty = async(propertyId:string) =>{
+    const property = await Property.findByIdAndUpdate(
+        propertyId,
+        {
+            isActive:false
+        },
+        {
+            new:true
+        }
+
+    )
+    if(!property){
+        throw new Error("Property not found")
+    }
+    return property;
+}

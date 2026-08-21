@@ -7,6 +7,7 @@ import {createPropertySchema,updatePropertySchema} from  '../validator/property.
 import * as propertyController from '../controllers/property.controller.js'
 const router = Router()
 router.post("/",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(createPropertySchema),propertyController.create)
+router.patch("/:id/deactivate",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.deactivateProperty)
 router.get("/my",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.getProperties)
 router.get(
     "/:id",
@@ -15,4 +16,5 @@ router.get(
     propertyController.getPropertyById
 );
 router.patch("/:id",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(updatePropertySchema),propertyController.updateProperty)
+
 export default router; 
