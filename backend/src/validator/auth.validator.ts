@@ -18,4 +18,11 @@ export const registerSchema  = z.object({
     .max(15,'phone number must not be longer than 15 characters')
     .optional(),
 })
+
+export const loginSchema = z.object({
+    email:z.string().trim().email('please provide a valid email address'),
+    password:z.string().min(1,'Password is required')
+})
+
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type loginInput = z.infer<typeof loginSchema>;

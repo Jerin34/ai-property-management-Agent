@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import {ROLES} from '../constants/roles.js'
 import User from '../models/user.model.js'
+import type { loginInput } from '../validator/auth.validator.js'
 import type {RegisterInput} from '../validator/auth.validator.js'
 import { generateWebToken } from '../utils/jwt.js'
 const register = async (data:RegisterInput) => {
@@ -34,4 +35,32 @@ return {
 }
 
 }
+export const login = async(data:loginInput) =>{
+   const user = await User.findOne({
+    email:data.email,
+   }).select("+password");
+
+if(!user){
+    throw new Error("Invalid email or Password")
+}
+const isPasswordValid  = await bcrypt.compare(data.password,user.password);
+if(!isPasswordValid){
+    throw new Error("Invalid email or password")
+}
+const token  = generateWebToken({
+    userId:user._id.toString(),
+    role:user.role
+})
+
+return{
+        user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        ...(user.phone !== undefined && { phone: user.phone }),
+        role: user.role,
+    },
+    token,
+};
+};
 export default {register};

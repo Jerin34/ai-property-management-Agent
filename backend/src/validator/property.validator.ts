@@ -1,5 +1,6 @@
 import {z} from 'zod'
 export type createPropertyInput = z.infer<typeof createPropertySchema>
+export type updatePropertyInput  = z.infer<typeof updatePropertySchema>
 export const createPropertySchema = z.object({
     name:z.string().min(2,'Property name must be atleast 2 charecters').max(150,'Property name must be less than 150 charecters '),
     address:z.object({
@@ -13,3 +14,4 @@ export const createPropertySchema = z.object({
 
 
 })
+export const updatePropertySchema = createPropertySchema.partial()
