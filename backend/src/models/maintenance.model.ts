@@ -10,15 +10,17 @@ export interface IMaintainance{
     tenant:mongoose.Types.ObjectId;
     title:string;
     description:string;
-    catergory:MaintenanceCategory,
+     aiSummary:string;
+    category:MaintenanceCategory;
     priority:MaintenancePriority;
     status:MaintenanceStatus;
-    techninician:mongoose.Types.ObjectId
+    technician:mongoose.Types.ObjectId,
+   
 }
 const maintainanceSchema = new Schema<IMaintainance>({
     property:{
         type:Schema.Types.ObjectId,
-        ref:'Property',
+        ref:'property',
             required:true,
     },
     tenant:{
@@ -36,7 +38,12 @@ const maintainanceSchema = new Schema<IMaintainance>({
         required:true,
         trim:true,
     },
-    catergory:{
+       aiSummary:{
+        type:String,
+        ref:'summary',
+        trim:true
+    },
+    category:{
         type:String,
         enum:Object.values(MAINTENANCE_CATEGORY),
         default:MAINTENANCE_CATEGORY.Other,
@@ -51,11 +58,12 @@ const maintainanceSchema = new Schema<IMaintainance>({
         enum:Object.values(MAINTENANCE_STATUS),
         default:MAINTENANCE_STATUS.Open
     },
-    techninician:{
+    technician:{
         type:Schema.Types.ObjectId,
         ref:'User',
         default:null
     },
+ 
 
 },{
     timestamps:true

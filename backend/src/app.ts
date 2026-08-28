@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import authRoutes from './routes/auth.routes.js'
 import propertyRoutes from './routes/property.routes.js'
 import userRoutes from  './routes/user.routes.js'
+import maintenanceRoutes from './routes/maintenance.routes.js' 
 const app = express()
 app.use(cors())
 app.use(helmet())
@@ -17,5 +18,7 @@ app.get('/',(req,res) =>{
 
 app.use('/api/auth',authRoutes)
 app.use('/api/properties',propertyRoutes)
+app.use('/api/maintenance',maintenanceRoutes)
 app.use('/api/users',userRoutes)
+
 export default app

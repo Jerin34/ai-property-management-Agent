@@ -1,9 +1,7 @@
 export const MAINTENANCE_STATUS = {
     Open: "OPEN",
-    Assigned: "ASSIGNED",
     InProgress: "IN_PROGRESS",
-    Resolved: "RESOLVED",
-    Closed: "CLOSED"
+    COMPLETED:"COMPLETED"
 } as const;
 
 export const MAINTENANCE_PRIORITY = {
