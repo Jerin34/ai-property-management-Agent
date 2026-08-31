@@ -21,6 +21,6 @@ app.use('/api/auth',authRoutes)
 app.use('/api/properties',propertyRoutes)
 app.use('/api/maintenance',maintenanceRoutes)
 app.use('/api/users',userRoutes)
-app.use("/api/maintenanceUpdate",maintenanceUpdateRoutes)
+app.use("/api/maintenance",maintenanceUpdateRoutes)
 
 export default app

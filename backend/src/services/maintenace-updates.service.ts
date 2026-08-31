@@ -25,11 +25,19 @@ export const createMaintenaceUpdate = async (maintenanceId:string,userId:string,
         }
     }
     const update = new MaintenaceUpdate({
-        maintenanceId,
-        userId,
+        maintenance:maintenanceId,
+        user:userId,
         message
     });
 
-    return update;
+    await  update.save();
 }
 
+export const viewMaintenaceReq = async(maintenaceId:string) =>{
+    const maintenance = await Maintaince.findById(maintenaceId);
+    if(!maintenance){
+        throw new Error("Maintenace Request was not found")
+    }
+    const updates = await MaintenaceUpdate.find({maintenance:maintenaceId}).populate("user","name email phone").sort({createdAt:1});
+    return updates;
+}

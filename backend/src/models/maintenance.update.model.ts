@@ -1,30 +1,39 @@
-import mongoose, {Schema,Types} from 'mongoose'
+import mongoose, { Schema, Types } from "mongoose";
 
-export interface IMaintenanceUpdate{
-    maintenance:Schema.Types.ObjectId,
-    user:Schema.Types.ObjectId,
-    message:string
+export interface IMaintenanceUpdate {
+    maintenance: Types.ObjectId;
+    user: Types.ObjectId;
+    message: string;
 }
-const maintenanceUpdateScheama = new Schema<IMaintenanceUpdate>({
-    maintenance:{
-        type:Schema.Types.ObjectId,
-        ref:"Maintenace",
-        required:true
+
+const maintenanceUpdateSchema = new Schema<IMaintenanceUpdate>(
+    {
+        maintenance: {
+            type: Schema.Types.ObjectId,
+            ref: "Maintainance",
+            required: true
+        },
+
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
+
+        message: {
+            type: String,
+            required: true,
+            trim: true
+        }
     },
-    user:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-        required:true
-    },
-    message:{
-        type:String,
-        required:true,
-        trim:true,
-    },
-},{
-    timestamps:true
-})
-const MaintenaceUpdate = mongoose.model<IMaintenanceUpdate>(
-    "MaintenanceUpate",maintenanceUpdateScheama
+    {
+        timestamps: true
+    }
 );
-export default MaintenaceUpdate;
+
+const MaintenanceUpdate = mongoose.model<IMaintenanceUpdate>(
+    "MaintenanceUpdate",
+    maintenanceUpdateSchema
+);
+
+export default MaintenanceUpdate;
