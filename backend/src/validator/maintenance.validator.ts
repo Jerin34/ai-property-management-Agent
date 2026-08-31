@@ -12,6 +12,10 @@ export const AssignTechnicianSchema = z.object({
 export const UpdatesTechnicianStatusSchema = z.object({
     status:z.enum(['IN_PROGRESS','COMPLETED'])
 })
+export const MaintenanceupdateSchema = z.object({
+    message:z.string().min(10,"Message must be atleast 10 characters").max(500,"Message must be less than 1000 words")
+})
 export type createMaintenanceInput = z.infer< typeof createMaintenanceSchema >;
 export type AssignTechnicianInput = z.infer< typeof AssignTechnicianSchema>;
 export type UpdatesTechnicianStatusInput = z.infer<typeof UpdatesTechnicianStatusSchema>;
+export type MaintenanceupdateInput = z.infer<typeof MaintenanceupdateSchema>;

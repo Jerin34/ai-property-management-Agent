@@ -1,7 +1,7 @@
 import { Request,Response } from 'express'
-import { createMaintenanceReq,getMaintenanceReq,getMaintenanceReqById,assignTechnician as assignTechnicainService ,ViewTechnicianReq as ViewTechnicianRequsetService,updateMaintenanceStatus as updateMaintenanceStatusService} from '../services/maintenance.service.js'
+import { createMaintenanceReq,getMaintenanceReq,getMaintenanceReqById,assignTechnician as assignTechnicainService ,ViewTechnicianReq as ViewTechnicianRequsetService,updateMaintenanceStatus as updateMaintenanceStatusService,getManagerinsights as getManagerInsightsService} from '../services/maintenance.service.js'
 import  { ROLES } from '../constants/roles.js'
-import Property from '../models/property.models.js';
+import Property from '../models/property.models.js'
 import Maintenance from '../models/maintenance.model.js'
 export const createMaintenance = async(req:Request,res:Response) :Promise<void> =>{
     try{
@@ -241,3 +241,38 @@ export const updateMaintenanceStatus = async(req:Request,res:Response):Promise<v
     }
 
 }
+
+export const getManagerInsights = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            res.status(401).json({
+                success: false,
+                message: "Authentication required"
+            });
+            return;
+        }
+
+        const insights = await getManagerInsightsService(
+            user.userId
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Manager insights generated successfully",
+            data: insights
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};

@@ -6,6 +6,8 @@ import {validate} from '../middleware/validator.middleware.js'
 import { createMaintenanceSchema,AssignTechnicianSchema ,UpdatesTechnicianStatusSchema } from "../validator/maintenance.validator.js";
 import * as maintainanceController from '../controllers/maintenance.controller.js'
 const router = Router()
+router.get('/insights',authenticate,autihorize(ROLES.Manager),
+    maintainanceController.getManagerInsights)
 router.post('/',authenticate,autihorize(ROLES.Tenant),validate(createMaintenanceSchema),maintainanceController.createMaintenance)
 
 router.get(

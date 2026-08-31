@@ -6,6 +6,7 @@ import { analyseMaintenaceRequest } from "./ai.service.js";
 import {ROLES} from '../constants/roles.js'
 import type { Role } from "../constants/roles.js";
 import { MAINTENANCE_STATUS } from "../constants/maintenance.js";
+import { gnerateManagerInsights } from './ai.service.js'
 
 export const createMaintenanceReq = async(data:createMaintenanceInput,tenantId:string) =>{
     const property = await Property.findById(data.propertyId)
@@ -36,12 +37,12 @@ export const getMaintenanceReq = async( userId:string,role:Role) =>{
     }
     if(role === ROLES.Manager){
         const properties =  await Property.find({manager:userId}).select("_id")
-        const propertyIds = await properties.map((property) => property._id)
-        return await Maintaince.find({
+        const propertyIds =  properties.map((property) => property._id)
+        const requests =  await Maintaince.find({
             property:{ $in : propertyIds},
         })
         .populate('property',"name address").populate("tenant", "name email address").populate("technician", "name email address")
-        
+        return requests;
     }
     return [];
 };
@@ -85,4 +86,9 @@ export const updateMaintenanceStatus = async(maintenaceId:string,technicianId:st
     maintenance.status = status;
     await maintenance.save();
     return maintenance;
+}
+export const getManagerinsights = async(managerId:string)=>{
+    const requests = await getMaintenanceReq(managerId,ROLES.Manager);
+    const insights = await gnerateManagerInsights(requests);
+    return insights;
 }
