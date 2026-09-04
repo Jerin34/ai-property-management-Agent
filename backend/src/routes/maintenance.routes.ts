@@ -26,6 +26,19 @@ router.get('/technician/my-requests',
     autihorize(ROLES.Technician),
     maintainanceController.ViewTechnicianReq
 )
+router.get(
+    "/:id/recurring",
+    authenticate,
+    autihorize(ROLES.Manager),
+    maintainanceController.detectRecurring
+)
+// router.patch(
+router.get(
+    "/:id/recommend-technician",
+    authenticate,
+    autihorize(ROLES.Manager),
+    maintainanceController.recommendTechnician
+);
 router.patch(
     "/:id/assign",
     authenticate,

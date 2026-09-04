@@ -1,6 +1,8 @@
 import { Request,Response } from 'express'
 import { createMaintenanceReq,getMaintenanceReq,getMaintenanceReqById,assignTechnician as assignTechnicainService ,ViewTechnicianReq as ViewTechnicianRequsetService,updateMaintenanceStatus as updateMaintenanceStatusService,getManagerinsights as getManagerInsightsService} from '../services/maintenance.service.js'
+import { recommendTechnicians } from '../services/recommendation.service.js'
 import  { ROLES } from '../constants/roles.js'
+import { detectRecurringMaintenace } from "../services/recurring.service.js";
 import Property from '../models/property.models.js'
 import Maintenance from '../models/maintenance.model.js'
 export const createMaintenance = async(req:Request,res:Response) :Promise<void> =>{
@@ -269,6 +271,88 @@ export const getManagerInsights = async (
 
     } catch (error) {
         console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};
+
+export const recommendTechnician = async(req:Request,res:Response):Promise<void> =>{
+    try{
+        const maintenaceId = req.params.id.toString();
+        const maintenace = await Maintenance.findById(maintenaceId)
+        if(!maintenace){
+            res.status(404).json({
+                success: false,
+                message: "Maintenance not found"
+            });
+            return;
+        }
+        const property = await Property.findById(maintenace.property);
+        if(!property){
+            res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+            return;
+        }
+        if (!property.location) {
+            res.status(400).json({
+                success: false,
+                message: "Property location not available"
+            });
+            return;
+        }
+        const category = maintenace.category
+        const priority = maintenace.priority
+        if(!category){
+            res.status(404).json({
+                success: false,
+                message: "Category not found"
+            });
+            return;
+        }
+        const recommendation = await recommendTechnicians(category,priority,property.location.latitude,property.location.longitude);
+        res.status(200).json({
+            success:true,data:recommendation
+        })
+
+    }
+    catch(err){
+        res.status(500).json({
+            success:false,message:'Internal Server Error'
+        })
+    }
+}
+export const detectRecurring = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const maintenance = await Maintenance.findById(req.params.id);
+
+        if (!maintenance) {
+            res.status(404).json({
+                success: false,
+                message: "Maintenance Request Not Found"
+            });
+            return;
+        }
+
+        const result = await detectRecurringMaintenace(
+            maintenance.property.toString(),
+            maintenance.category
+        );
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (err) {
+        console.error(err);
 
         res.status(500).json({
             success: false,

@@ -1,4 +1,8 @@
 import mongoose, { Schema } from "mongoose";
+export interface IpropertyLocation{
+    latitude:number;
+    longitude:number;
+};
 export interface IProperty {
   name: String;
   address: {
@@ -11,6 +15,8 @@ export interface IProperty {
   manager: mongoose.Types.ObjectId;
   description?: string;
   isActive: boolean;
+  location:IpropertyLocation
+ 
 }
 
 const propertySchema = new Schema<IProperty>(
@@ -26,6 +32,14 @@ const propertySchema = new Schema<IProperty>(
     manager: { type: Schema.Types.ObjectId, ref: "User", required: true },
     description: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
+    location:{
+      latitude:{
+        type:Number,
+      },
+      longitude:{
+        type:Number
+      }
+    }
   },
   { timestamps: true },
 );

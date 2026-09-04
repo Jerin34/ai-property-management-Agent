@@ -11,6 +11,10 @@ export const createPropertySchema = z.object({
         country:z.string().min(2,'Country must be atleast 2 charecters'),
     }),
     description:z.string().max(500,'Description must be less than 500 charecters').trim().optional(),
+    location: z.object({
+    latitude: z.number(),
+    longitude: z.number()
+}).optional(),
 
 
 })
