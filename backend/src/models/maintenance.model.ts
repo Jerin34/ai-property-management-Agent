@@ -15,6 +15,8 @@ export interface IMaintainance{
     priority:MaintenancePriority;
     status:MaintenanceStatus;
     technician:mongoose.Types.ObjectId,
+    createdAt?:Date;
+    updatedAt?:Date;
    
 }
 const maintainanceSchema = new Schema<IMaintainance>({

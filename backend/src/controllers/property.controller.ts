@@ -1,7 +1,8 @@
 import type {Request,Response} from 'express';
 import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService} from '../services/property.service.js';
+import { PropertyHealthService } from '../services/property-health.services.js'
 import {ROLES} from '../constants/roles.js'
-import { success } from 'zod';
+import { ManagerCopilotService } from '../services/manager-copilot.services.js';
 export const create  =  async(req:Request,res:Response): Promise<void>=>{
     try{
         if(!req.user){
@@ -175,4 +176,35 @@ export const deactivateProperty =async (req:Request,res:Response):Promise<void> 
     }
 
 
+}
+export const getPropertyHealth = async(req:Request,res:Response):Promise<void> =>{
+    try{
+        const propertyId = req.params.id.toString();
+        if(!req.user){
+            res.status(401).json({
+                success:false,
+                message:'Unauthorized User'
+            });
+            return ;
+        }
+        const health = await PropertyHealthService(propertyId);
+        res.status(200).json({success:true,data:health});
+    }
+    catch(err){
+        res.status(500).json({
+            success:false,
+            message:'Internal Server Error'
+        });
+    }
+}
+export const ManagerCopilot = async(req:Request,res:Response):Promise<void> =>{
+    try{
+        const propertyId = req.params.id.toString();
+        const analysis = await ManagerCopilotService(propertyId);
+        res.status(200).json({success:true,data:analysis});
+    }catch(err){
+        res.status(500).json({
+            success:false,message:"Internal Server Error"
+        })  
+    }
 }

@@ -15,6 +15,13 @@ router.get(
     autihorize(ROLES.Admin, ROLES.Manager),
     propertyController.getPropertyById
 );
+router.get(
+    "/:id/copilot",
+    authenticate,
+    autihorize(ROLES.Admin, ROLES.Manager),
+    propertyController.ManagerCopilot
+);
+router.get('/:id/health',authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.getPropertyHealth)
 router.patch("/:id",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(updatePropertySchema),propertyController.updateProperty)
 
 export default router; 
