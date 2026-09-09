@@ -11,7 +11,7 @@ export const ManagerCopilotService  =  async(propertyId:string)=>{
         throw new Error("Property not found");
     }
     const maintenanceReq = await Maintaince.find({property:new mongoose.Types.ObjectId(propertyId)});
-    console.log(maintenanceReq);    
+        
     const health = await PropertyHealthService(propertyId);
     const maintenaceData = maintenanceReq.map((request) =>({
         category: request.category,
@@ -20,7 +20,7 @@ export const ManagerCopilotService  =  async(propertyId:string)=>{
         description: request.description,
         createdAt: request.createdAt
     }));
-    console.log("MAINTENANCE DATA:", maintenaceData)
+   
    const prompt = `
 You are an AI Property Management Copilot for property managers.
 

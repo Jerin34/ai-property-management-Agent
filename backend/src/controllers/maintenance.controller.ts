@@ -2,6 +2,7 @@ import { Request,Response } from 'express'
 import { createMaintenanceReq,getMaintenanceReq,getMaintenanceReqById,assignTechnician as assignTechnicainService ,ViewTechnicianReq as ViewTechnicianRequsetService,updateMaintenanceStatus as updateMaintenanceStatusService,getManagerinsights as getManagerInsightsService} from '../services/maintenance.service.js'
 import { recommendTechnicians } from '../services/recommendation.service.js'
 import  { ROLES } from '../constants/roles.js'
+import { MaintenanceAlertService } from '../services/maintenace-Alert_services.types.js'
 import { detectRecurringMaintenace } from "../services/recurring.service.js";
 import Property from '../models/property.models.js'
 import Maintenance from '../models/maintenance.model.js'
@@ -360,3 +361,18 @@ export const detectRecurring = async (
         });
     }
 };
+
+export const getMaintenanceAlert = async(req:Request,res:Response):Promise<void> =>{
+    try{
+   
+    const alerts = await MaintenanceAlertService()
+    res.status(200).json({
+        success:true,data:alerts
+    })
+    
+}catch(err){
+    res.status(500).json({
+        success:false,message:'Internal Server Error'
+    })
+}
+}
