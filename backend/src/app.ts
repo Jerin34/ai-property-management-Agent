@@ -7,6 +7,7 @@ import userRoutes from  './routes/user.routes.js'
 import maintenanceRoutes from './routes/maintenance.routes.js' 
 import notificationsRoutes from './routes/notification.routes.js'
 import maintenanceUpdateRoutes from './routes/maintenance-update.routes.js'
+import notificationPreferencesRoutes from './routes/notification_preferences.routes.js'
 const app = express()
 app.use(cors())
 app.use(helmet())
@@ -22,6 +23,7 @@ app.use('/api/auth',authRoutes)
 app.use('/api/properties',propertyRoutes)
 app.use('/api/maintenance',maintenanceRoutes)
 app.use('/api/users',userRoutes)
+app.use('/api/notifications/preferences',notificationPreferencesRoutes)
 app.use("/api/maintenance",maintenanceUpdateRoutes)
 app.use("/api/notifications",notificationsRoutes)
 

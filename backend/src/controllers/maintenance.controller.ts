@@ -2,7 +2,7 @@ import { Request,Response } from 'express'
 import { createMaintenanceReq,getMaintenanceReq,getMaintenanceReqById,assignTechnician as assignTechnicainService ,ViewTechnicianReq as ViewTechnicianRequsetService,updateMaintenanceStatus as updateMaintenanceStatusService,getManagerinsights as getManagerInsightsService} from '../services/maintenance.service.js'
 import { recommendTechnicians } from '../services/recommendation.service.js'
 import  { ROLES } from '../constants/roles.js'
-import { MaintenanceAlertService } from '../services/maintenace-Alert_services.types.js'
+import { MaintenanceAlertService } from '../services/maintenace-Alert_services.js'
 import { detectRecurringMaintenace } from "../services/recurring.service.js";
 import Property from '../models/property.models.js'
 import Maintenance from '../models/maintenance.model.js'

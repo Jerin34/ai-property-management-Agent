@@ -13,7 +13,8 @@ export type NotificationSeverity = |'LOW'| 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 export interface INotification{
     recipient:mongoose.Types.ObjectId;
-    maintenanceId:mongoose.Types.ObjectId;
+    propertyId?: mongoose.Types.ObjectId;
+    maintenanceId?:mongoose.Types.ObjectId;
     type:NotificationType;
     severity:NotificationSeverity
     title:string;

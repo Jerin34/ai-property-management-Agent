@@ -21,6 +21,10 @@ const NotificationSchema = new Schema <INotification>(
             type:Schema.Types.ObjectId,
             ref:"Maintenance"
         },
+        propertyId: {
+    type: Schema.Types.ObjectId,
+    ref: "Property"
+},
         severity:{
             type:String,
             enum:['LOW','MEDIUM','HIGH','CRITICAL']
