@@ -13,3 +13,8 @@ export const getMaintenanceScheduleById = async(id:string) =>{
     const schedule  =  await MaintenanceSchedule.findById(id);
     return schedule;
 }
+export const getMaintenaceDueSchedules = async() =>{
+    const now = new Date();
+    const schedules = await MaintenanceSchedule.find({isActive:true,nextDueDate:{$lte:now}}).sort({nextDueDate:-1});
+    return schedules;
+}   
