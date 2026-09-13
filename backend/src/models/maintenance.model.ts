@@ -13,8 +13,10 @@ export interface IMaintainance{
      aiSummary:string;
     category:MaintenanceCategory;
     priority:MaintenancePriority;
+    esclationLevel?:"NONE"|'HIGH'|'CRITICAL';
     status:MaintenanceStatus;
     technician:mongoose.Types.ObjectId,
+    escaltedAt?:Date;
     createdAt?:Date;
     updatedAt?:Date;
    
@@ -55,6 +57,11 @@ const maintainanceSchema = new Schema<IMaintainance>({
         enum:Object.values(MAINTENANCE_PRIORITY),
         default:MAINTENANCE_PRIORITY.Medium,
     },
+    esclationLevel:{
+        type:String,
+        enum:['NONE','HIGH','CRITICAL'],
+        default:'NONE'
+    },
     status:{
         type:String,
         enum:Object.values(MAINTENANCE_STATUS),
@@ -65,6 +72,9 @@ const maintainanceSchema = new Schema<IMaintainance>({
         ref:'User',
         default:null
     },
+    escaltedAt:{
+        type:Date
+    }
  
 
 },{

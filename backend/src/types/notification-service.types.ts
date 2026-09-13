@@ -6,7 +6,8 @@ export type NotificationType =
     | "EMERGENCY_MAINTENANCE"
     | "HIGH_PRIORITY_UNRESOLVED"
     | "LOW_PROPERTY_HEALTH"
-    | "MAINTENANCE_BACKLOG";
+    | "MAINTENANCE_BACKLOG"
+    |  "MAINTENANCE_ESCALATED";
 
 export type NotificationSeverity = |'LOW'| 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
