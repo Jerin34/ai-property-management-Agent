@@ -1,0 +1,8 @@
+import Router from 'express'
+import {updateCost } from '../controllers/maintenance_cost.controller.js'
+import authenticate  from "../middleware/auth.middileware.js";
+import {autihorize} from "../middleware/role.middleware.js"
+import { ROLES } from "../constants/roles.js";
+const router = Router()
+router.patch("/:id/cost",authenticate,autihorize(ROLES.Admin,ROLES.Manager),updateCost);
+export default router

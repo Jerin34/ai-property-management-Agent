@@ -19,7 +19,10 @@ export interface IMaintainance{
     escaltedAt?:Date;
     createdAt?:Date;
     updatedAt?:Date;
-   
+    estimatedCost?:number;
+    actualCost?:number;
+    laborCost?:number;
+    materialCost?:number;
 }
 const maintainanceSchema = new Schema<IMaintainance>({
     property:{
@@ -74,7 +77,25 @@ const maintainanceSchema = new Schema<IMaintainance>({
     },
     escaltedAt:{
         type:Date
+    },
+    estimatedCost:{
+        type:Number,
+        min:0
+    },
+    actualCost:{
+        type:Number,
+        min:0,
+    },
+    laborCost:{
+        type:Number,
+        min:0
+    },
+    materialCost:{
+        type:Number,
+        min:0
     }
+
+
  
 
 },{
