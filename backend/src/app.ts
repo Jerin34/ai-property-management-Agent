@@ -10,6 +10,7 @@ import maintenanceRoutes from './routes/maintenance.routes.js'
 import maintenanceUpdateRoutes from './routes/maintenance-update.routes.js'
 import maintenanceCostRoutes from './routes/maintenance_cost.routes.js'
 import tenantMaintenanceHistoryRoutes from './routes/maintenance_history.routes.js'
+import MaintenanceCostAnalytics from './routes/maintenance-cost-analytics.routes.js'
 
 import maintenanceSchedulerRoutes from './routes/maintenance_scheduler.routes.js'
 import maintenanaceEscalaltion from './routes/maintenance_escaltion.routes.js'
@@ -79,6 +80,7 @@ app.use(
     '/api/maintenance',
     maintenanceRoutes
 )
+app.use('/api/maintenance_cost', MaintenanceCostAnalytics)
 
 // Update maintenance status
 app.use(
@@ -91,7 +93,7 @@ app.use(
     '/api/maintenance',
     maintenanceCostRoutes
 )
-
+//cost analytics
 
 // ==================================================
 // TENANT MAINTENANCE
