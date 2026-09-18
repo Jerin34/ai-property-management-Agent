@@ -12,6 +12,7 @@ import maintenanceCostRoutes from './routes/maintenance_cost.routes.js'
 import tenantMaintenanceHistoryRoutes from './routes/maintenance_history.routes.js'
 import MaintenanceCostAnalytics from './routes/maintenance-cost-analytics.routes.js'
 import MaintenanceSLA from './routes/maintenance_sla.routes.js'
+import MaintenanceCostPrediction  from './routes/maintenance_cost_prediction.routes.js'
 
 import maintenanceSchedulerRoutes from './routes/maintenance_scheduler.routes.js'
 import maintenanaceEscalaltion from './routes/maintenance_escaltion.routes.js'
@@ -129,6 +130,14 @@ app.use(
 // MAINTENANCE SLA
 // ==================================================
 app.use('/api/maintenance_sla', MaintenanceSLA)
+
+//=================================================
+// MAINTENANCE COST PREDICTION
+// ==================================================
+app.use(
+   "/api/maintenance_cost",MaintenanceCostPrediction
+);
+
 
 // ==================================================
 // MAINTENANCE ANALYTICS
