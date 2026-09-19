@@ -13,6 +13,7 @@ import tenantMaintenanceHistoryRoutes from './routes/maintenance_history.routes.
 import MaintenanceCostAnalytics from './routes/maintenance-cost-analytics.routes.js'
 import MaintenanceSLA from './routes/maintenance_sla.routes.js'
 import MaintenanceCostPrediction  from './routes/maintenance_cost_prediction.routes.js'
+import  AIPreventiveRecommendationRoutes from './routes/ai_preventive_recommendation.routes.js'
 
 import maintenanceSchedulerRoutes from './routes/maintenance_scheduler.routes.js'
 import maintenanaceEscalaltion from './routes/maintenance_escaltion.routes.js'
@@ -71,8 +72,14 @@ app.use(
     '/api/properties',
     propertyRoutes
 )
+// ===============================================
+// PREVENTIVE MAINTENANCE
+//===============================================
 
-
+app.use(
+    "/api/properties",
+    AIPreventiveRecommendationRoutes
+);
 // ==================================================
 // MAINTENANCE
 // ==================================================
@@ -137,6 +144,7 @@ app.use('/api/maintenance_sla', MaintenanceSLA)
 app.use(
    "/api/maintenance_cost",MaintenanceCostPrediction
 );
+
 
 
 // ==================================================
