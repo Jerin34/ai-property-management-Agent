@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRoute.tsx";
 import RoleRoute from "./RoleRoute.tsx";
 import LoginPage from "../pages/LoginPage.tsx";
 import DashBoardPage from "../pages/DashboardPage.tsx";
+import PropertiesPage from "../pages/PropertiesPage.tsx";
 import Applayout from "../layouts/Applayout.tsx";
 function ManagerDashboardPage(){
     return (
@@ -19,6 +20,7 @@ function AppRoutes(){
               <Route path="/dashboard" element={<DashBoardPage/>}/>
               <Route element = {<RoleRoute allowedRoles={['ADMIN','MANAGER']} />} >
               <Route path="/management" element={<ManagerDashboardPage/>}/>
+              <Route path="/properties" element={<PropertiesPage/>} />
               </Route>
             </Route>
           </Route>

@@ -1,7 +1,12 @@
 import { useState,useEffect } from "react";
 import  getMaintenaceAnalytics from '../api/analytics.api';
 import type { MaintenanceAnalytics } from "../types/analytics.types";
-
+import KpiCard from "../components/kpicards";
+import PriorityBreakdown from "../components/priorityBreakdown";
+import CategroyBreakdown from "../components/categoryBreakdown";
+import TechnicianWorkLoad from "../components/TechnicianWorkload";
+import PropertyIssues from "../components/propertyIssues";
+import ResolutionMetric from "../components/ResolutionMetric";
 function DashboardPage(){
     const [analytics, setAnalytics] = useState<MaintenanceAnalytics | null>(null);
     const [isLoading,setIsLoading] = useState(false);
@@ -37,10 +42,18 @@ function DashboardPage(){
     return (
         <div>
             <h1>Dashboard </h1>
-            <p> Total Requests:{""}{analytics.overview.totalRequests}</p>
-            <p> Open Requests:{""}{analytics.overview.openRequests}</p>
-            <p> In Progress:{""}{analytics.overview.inProgressRequests}</p>
-            <p> Completed:{""}{analytics.overview.completedRequests}</p>
+            <div className="kpi-grid">
+                <KpiCard title="Total Requests" value={analytics.overview.totalRequests} />
+                <KpiCard title="Open Requests" value={analytics.overview.openRequests} />
+                <KpiCard title="In Progress Requests" value={analytics.overview.inProgressRequests} />
+                <KpiCard title="Compeleted Requests" value={analytics.overview.completedRequests} />
+                <PriorityBreakdown data={analytics.byPriority} />
+                <CategroyBreakdown data={analytics.byCategory} />
+                <TechnicianWorkLoad data={analytics.technicianWorkload} />
+                <PropertyIssues data={analytics.propertyIssues} />
+                <ResolutionMetric averageResolutionTimeHours={analytics.resolutionMetrics.averageResolutionTimeHours} />
+            </div>
+            
         </div>
     )
 }
