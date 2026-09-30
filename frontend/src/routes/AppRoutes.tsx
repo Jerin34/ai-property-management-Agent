@@ -5,6 +5,7 @@ import LoginPage from "../pages/LoginPage.tsx";
 import DashBoardPage from "../pages/DashboardPage.tsx";
 import PropertiesPage from "../pages/PropertiesPage.tsx";
 import Applayout from "../layouts/Applayout.tsx";
+import PropertyDetailsPage from "../pages/PropertyDetailsPage.tsx";
 function ManagerDashboardPage(){
     return (
     <h1>Manager Dashboard Page</h1>
@@ -21,6 +22,7 @@ function AppRoutes(){
               <Route element = {<RoleRoute allowedRoles={['ADMIN','MANAGER']} />} >
               <Route path="/management" element={<ManagerDashboardPage/>}/>
               <Route path="/properties" element={<PropertiesPage/>} />
+              <Route path="/properties/:id" element={<PropertyDetailsPage/>} />
               </Route>
             </Route>
           </Route>

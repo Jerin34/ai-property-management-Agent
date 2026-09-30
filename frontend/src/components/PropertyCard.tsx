@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom'
 import type {Property} from '../types/property.types'
 interface PropertyCardProps{
     property:Property
 }
 function PropertyCard({property}:PropertyCardProps){
+  const navigate = useNavigate()
     return(
         <div>
             <h2>{property.name}</h2>
@@ -24,6 +26,9 @@ function PropertyCard({property}:PropertyCardProps){
       {property.description && (
         <p>{property.description}</p>
       )}
+      <button onClick={() => navigate(`/properties/${property._id}`)}>
+        View Details
+      </button>
         </div>
     )
 }

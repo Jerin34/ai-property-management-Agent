@@ -31,7 +31,6 @@ function PropertiesPage() {
     return(
         <div>
             <p>Total Properties: {properties.length}</p>
-
   {properties.length === 0 ? (
     <p>No properties found.</p>
   ) : (
