@@ -5,6 +5,7 @@ import LoginPage from "../pages/LoginPage.tsx";
 import DashBoardPage from "../pages/DashboardPage.tsx";
 import PropertiesPage from "../pages/PropertiesPage.tsx";
 import Applayout from "../layouts/Applayout.tsx";
+import MaintenancePage from "../pages/MaintenancePage.tsx";
 import PropertyDetailsPage from "../pages/PropertyDetailsPage.tsx";
 function ManagerDashboardPage(){
     return (
@@ -23,6 +24,7 @@ function AppRoutes(){
               <Route path="/management" element={<ManagerDashboardPage/>}/>
               <Route path="/properties" element={<PropertiesPage/>} />
               <Route path="/properties/:id" element={<PropertyDetailsPage/>} />
+              <Route path="/maintenance" element={<MaintenancePage/>}/>
               </Route>
             </Route>
           </Route>

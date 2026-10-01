@@ -1,19 +1,30 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getPropertyById ,getPropertiesHealth,getPropertyCopilot } from "../api/property.api";
+import {
+  getPropertyById,
+  getPropertiesHealth,
+  getPropertyCopilot,
+} from "../api/property.api";
+
 import type { Property } from "../types/property.types";
 import type { PropertyHealthResult } from "../types/property-health.types";
 import type { PropertyCopilotResult } from "../types/property-copilot.types";
+
 import CopilotPanel from "../components/CopilotPanel";
 
 function PropertyDetailsPage() {
   const { id } = useParams();
 
   const [property, setProperty] = useState<Property | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [health, setHealth] = useState<PropertyHealthResult | null>(null);
   const [copilot, setCopilot] = useState<PropertyCopilotResult | null>(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCopilotLoading, setIsCopilotLoading] = useState(true);
+
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch property and health
   useEffect(() => {
     const fetchProperty = async () => {
       if (!id) return;
@@ -22,12 +33,13 @@ function PropertyDetailsPage() {
         setIsLoading(true);
         setError(null);
 
-        const data = await getPropertyById(id);
-        setProperty(data);
-        const healthData = await getPropertiesHealth(id);
-        setHealth(healthData);  
-        const copilotData = await getPropertyCopilot(id);
-        setCopilot(copilotData);
+        const [propertyData, healthData] = await Promise.all([
+          getPropertyById(id),
+          getPropertiesHealth(id),
+        ]);
+
+        setProperty(propertyData);
+        setHealth(healthData);
       } catch (error) {
         console.error("Failed to fetch property:", error);
         setError("Failed to load property.");
@@ -38,7 +50,27 @@ function PropertyDetailsPage() {
 
     fetchProperty();
   }, [id]);
-  
+
+  // Fetch AI Copilot separately
+  useEffect(() => {
+    const fetchCopilot = async () => {
+      if (!id) return;
+
+      try {
+        setIsCopilotLoading(true);
+
+        const copilotData = await getPropertyCopilot(id);
+
+        setCopilot(copilotData);
+      } catch (error) {
+        console.error("Failed to fetch Copilot:", error);
+      } finally {
+        setIsCopilotLoading(false);
+      }
+    };
+
+    fetchCopilot();
+  }, [id]);
 
   if (isLoading) {
     return <p>Loading property...</p>;
@@ -73,45 +105,54 @@ function PropertyDetailsPage() {
       {property.description && (
         <p>{property.description}</p>
       )}
+
       <h2>Location</h2>
 
-<a
-  href={`https://www.google.com/maps?q=${property.location.latitude},${property.location.longitude}`}
-  target="_blank"
-  rel="noopener noreferrer"
->
-  View Property Location
-</a>
-<h2>Property Health</h2>
+      <a
+        href={`https://www.google.com/maps?q=${property.location.latitude},${property.location.longitude}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        View Property Location
+      </a>
 
-{health ? (
-  <div>
-    <p>Health Score: {health.healthScore}</p>
-    <p>Risk Level: {health.riskLevel}</p>
-    <p>Total Requests: {health.totalRequests}</p>
-    <p>High Priority Requests: {health.highPriorityRequests}</p>
-    <p>Emergency Requests: {health.emergencyRequests}</p>
-    <p>Open Requests: {health.openRequests}</p>
+      <h2>Property Health</h2>
 
-    <h3>Reasons</h3>
+      {health ? (
+        <div>
+          <p>Health Score: {health.healthScore}</p>
+          <p>Risk Level: {health.riskLevel}</p>
+          <p>Total Requests: {health.totalRequests}</p>
+          <p>
+            High Priority Requests: {health.highPriorityRequests}
+          </p>
+          <p>
+            Emergency Requests: {health.emergencyRequests}
+          </p>
+          <p>Open Requests: {health.openRequests}</p>
 
-    {health.reasons.length === 0 ? (
-      <p>No health issues detected.</p>
-    ) : (
-      <ul>
-        {health.reasons.map((reason, index) => (
-          <li key={index}>{reason}</li>
-        ))}
-      </ul>
-    )}
-  </div>
-) : (
-  <p>Property health unavailable.</p>
-)}
-<CopilotPanel copilot={copilot} />
+          <h3>Reasons</h3>
+
+          {health.reasons.length === 0 ? (
+            <p>No health issues detected.</p>
+          ) : (
+            <ul>
+              {health.reasons.map((reason, index) => (
+                <li key={index}>{reason}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : (
+        <p>Property health unavailable.</p>
+      )}
+
+      <CopilotPanel
+        copilot={copilot}
+        isLoading={isCopilotLoading}
+      />
     </div>
   );
 }
-
 
 export default PropertyDetailsPage;
