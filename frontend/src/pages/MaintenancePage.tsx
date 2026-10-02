@@ -1,8 +1,12 @@
 import { useState,useEffect} from 'react'
 import { getMaintenanceRequests } from '../api/maintenance.api'
 import type { Maintenance } from '../types/maintenance.types'
+import { useNavigate } from 'react-router-dom'
 import MaintenanceCard from '../components/MaintenanceCards'
+import { useAuth } from '../context/Authcontext'
 function MaintenancePage(){
+  const { user } = useAuth();
+const navigate = useNavigate();
     const [maintenance,setMaintenance] = useState<Maintenance[]>([]);
     const [isLoading,setIsLoading] = useState(true);
     const [error , setError] = useState<string| null>(null);    
@@ -48,6 +52,11 @@ function MaintenancePage(){
           ))}
         </div>
       )}
+      {user?.role === "TENANT" && (
+  <button onClick={() => navigate("/maintenance/create")}>
+    Create Maintenance Request
+  </button>
+)}
         </div>
     )
 }

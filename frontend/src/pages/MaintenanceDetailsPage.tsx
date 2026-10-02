@@ -1,0 +1,149 @@
+import {useState,useEffect} from 'react';
+import {useParams} from 'react-router-dom';
+import { getMaintenanceById } from '../api/maintenance.api';
+import type { Maintenance } from '../types/maintenance.types';
+function MaintenanceDetailsPage() {
+    const { id } = useParams();
+    const [maintenance,setMaintenance] = useState<Maintenance | null>(null);
+    const [isLoading,setIsLoading] = useState(true);
+    const [error,setError] = useState<string | null>(null);
+    useEffect(() =>{
+        const fetchMaintenance = async () =>{
+            if(!id){
+                setError("Maintenance request ID is missing.");
+                setIsLoading(false);
+                 return ;
+            }
+            try{
+                setIsLoading(true);
+                setError(null);
+                const data = await getMaintenanceById(id);
+                setMaintenance(data);
+            }
+            catch(err){
+                console.log("Error loading maintenance requests",err);
+                setError("Failed to load maintenance requests")
+            }
+            finally{
+                setIsLoading(false);
+            }
+        }
+        fetchMaintenance();
+    },[id])
+    if(isLoading){
+       return <p>Loading.........</p>
+    }
+    if(error){
+        return <p>{error}</p>
+    }
+    if(!maintenance){
+        return <p>Maintenance request not found</p>
+    }
+    return(
+        <div>
+            <h1>Maintenance Request</h1>
+            <h2>{maintenance.title}</h2>
+            <h3>Description</h3>
+            <p>{maintenance.description}</p>
+            <h3>AI Summary</h3>
+            <p>{maintenance.aiSummary===null?"No summary available":maintenance?.aiSummary}</p>
+            <h3>Request Information</h3>
+            <p>
+                <strong>Priority:</strong>{" "}{maintenance.priority}
+            </p>
+            <p>
+                <strong>Status:</strong>{" "}{maintenance.status}
+            </p>
+            <p>
+        <strong>Escalation Level:</strong>{" "}
+        {maintenance.esclationLevel ?? "NONE"}
+      </p>
+      <h3>Property</h3>
+        {typeof maintenance.property === "string" ? (
+        <p>{maintenance.property}</p>
+      ) : (
+        <p>
+          {maintenance.property.name ??
+            maintenance.property._id}
+        </p>
+      )}
+      <h3>Tenant</h3>
+      {typeof maintenance.tenant === "string" ? (
+        <p>{maintenance.tenant}</p>
+      ) : (
+        <div>
+          <p>
+            {maintenance.tenant.name ??
+              maintenance.tenant._id}
+          </p>
+
+          {maintenance.tenant.email && (
+            <p>{maintenance.tenant.email}</p>
+          )}
+        </div>
+      )}
+      <h3>Technician</h3>
+      {!maintenance.technician ? (
+        <p>No technician assigned.</p>
+      ) : typeof maintenance.technician === "string" ? (
+        <p>{maintenance.technician}</p>
+      ) : (
+        <div>
+          <p>
+            {maintenance.technician.name ??
+              maintenance.technician._id}
+          </p>
+
+          {maintenance.technician.email && (
+            <p>{maintenance.technician.email}</p>
+          )}
+        </div>
+      )}
+      <h3>Costs</h3>
+        <p>
+        <strong>Estimated Cost:</strong>{" "}
+        {maintenance.estimatedCost ?? "Not available"}
+      </p>
+
+      <p>
+        <strong>Actual Cost:</strong>{" "}
+        {maintenance.actualCost ?? "Not available"}
+      </p>
+
+      <p>
+        <strong>Labor Cost:</strong>{" "}
+        {maintenance.laborCost ?? "Not available"}
+      </p>
+
+      <p>
+        <strong>Material Cost:</strong>{" "}
+        {maintenance.materialCost ?? "Not available"}
+      </p>
+ <h3>Dates</h3>
+
+      <p>
+        <strong>Created:</strong>{" "}
+        {new Date(
+          maintenance.createdAt
+        ).toLocaleString()}
+      </p>
+
+      <p>
+        <strong>Updated:</strong>{" "}
+        {new Date(
+          maintenance.updatedAt
+        ).toLocaleString()}
+      </p>
+
+      {maintenance.escaltedAt && (
+        <p>
+          <strong>Escalated:</strong>{" "}
+          {new Date(
+            maintenance.escaltedAt
+          ).toLocaleString()}
+        </p>
+      )}
+        </div>
+    )
+}
+export default MaintenanceDetailsPage

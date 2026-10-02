@@ -35,7 +35,7 @@ export const AuthProvider = ({
     storage.getToken()
   );
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 useEffect(() => {
   const restoreSession = async () =>{
     const token = storage.getToken();

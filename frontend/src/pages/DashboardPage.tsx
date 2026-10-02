@@ -7,13 +7,22 @@ import CategroyBreakdown from "../components/categoryBreakdown";
 import TechnicianWorkLoad from "../components/TechnicianWorkload";
 import PropertyIssues from "../components/propertyIssues";
 import ResolutionMetric from "../components/ResolutionMetric";
+import { useAuth } from "../context/Authcontext";
 function DashboardPage(){
     const [analytics, setAnalytics] = useState<MaintenanceAnalytics | null>(null);
     const [isLoading,setIsLoading] = useState(false);
     const [error ,setError] = useState<string| null>(null);
-
+    const { user } = useAuth();
     useEffect(() =>{
+        
         const fetchAnalytics = async () =>{
+             if (
+            !user ||
+            (user.role !== "ADMIN" && user.role !== "MANAGER")
+        ) {
+            setIsLoading(false);
+            return;
+        }
             try{
                 setIsLoading(true);
                 setError(null); 
@@ -29,7 +38,7 @@ function DashboardPage(){
             }
         };
         fetchAnalytics();
-    },[]);
+    },[user]);
     if(isLoading){
      return <p>Loading</p>
     }
