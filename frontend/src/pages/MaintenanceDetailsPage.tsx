@@ -1,12 +1,19 @@
 import {useState,useEffect} from 'react';
 import {useParams} from 'react-router-dom';
-import { getMaintenanceById } from '../api/maintenance.api';
+import { getMaintenanceById, getTechnicianRecommendation ,assignTechnician} from '../api/maintenance.api';
 import type { Maintenance } from '../types/maintenance.types';
+import type { TechnicianRecommendation } from '../types/technician.types';
+import TechnicianRecommendations from '../components/TechnicianRecommendation';
+import { useAuth } from '../context/Authcontext';
 function MaintenanceDetailsPage() {
     const { id } = useParams();
+    const { user } = useAuth();
     const [maintenance,setMaintenance] = useState<Maintenance | null>(null);
     const [isLoading,setIsLoading] = useState(true);
     const [error,setError] = useState<string | null>(null);
+    const [recommendations,setRecommendations] = useState<TechnicianRecommendation[]>([]);
+    const [isRecommendationLoading,setIsRecommendationLoading] = useState(true);
+    const [isAssigning,setIsAssigning] = useState(false);
     useEffect(() =>{
         const fetchMaintenance = async () =>{
             if(!id){
@@ -19,6 +26,19 @@ function MaintenanceDetailsPage() {
                 setError(null);
                 const data = await getMaintenanceById(id);
                 setMaintenance(data);
+                if(user?.role === 'MANAGER'){
+                  try{
+                    setIsRecommendationLoading(true)
+                    const recommendationData = await getTechnicianRecommendation(id);
+                    setRecommendations(recommendationData);
+                  }catch(err){
+                    console.log("Error loading technician recommendation",err);
+                  }
+                  finally{
+                    setIsRecommendationLoading(false)
+                  }
+                }
+
             }
             catch(err){
                 console.log("Error loading maintenance requests",err);
@@ -29,7 +49,7 @@ function MaintenanceDetailsPage() {
             }
         }
         fetchMaintenance();
-    },[id])
+    },[id,user])
     if(isLoading){
        return <p>Loading.........</p>
     }
@@ -143,6 +163,29 @@ function MaintenanceDetailsPage() {
           ).toLocaleString()}
         </p>
       )}
+      {user?.role === "MANAGER" && (
+  <TechnicianRecommendations
+    recommendations={recommendations}
+    isLoading={isRecommendationLoading}
+    isAssigning={isAssigning}
+    onSelect={
+      async (technicianId) =>{
+        if(!id){
+          return ;
+    };
+    try{
+      setIsAssigning(true);
+      const updatedMaintence = await assignTechnician(id,{technicianId});
+      setMaintenance(updatedMaintence);
+    }catch(err){
+      console.log('Technician Assignement error',err)
+      
+    }finally{
+      setIsAssigning(false);      
+    };
+    }}
+  />
+)}
         </div>
     )
 }

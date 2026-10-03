@@ -1,5 +1,4 @@
 import apiClient from "./client";
-
 import type {
   Maintenance,
   CreateMaintenanceInput,
@@ -11,6 +10,12 @@ import type {
   MaintenanceListResponse,
   MaintenanceResponse,
 } from "../types/maintenance.api.types";
+import type { TechnicianRecommendation } from "../types/technician.types";
+interface TechinicanRecommendationResponse{
+  success:boolean
+  message?:string
+  data:TechnicianRecommendation[]
+}
 
 /*
  * Get maintenance requests
@@ -146,6 +151,18 @@ export const updateMaintenanceCost = async (
     await apiClient.patch<MaintenanceResponse>(
       `/maintenance/${id}/cost`,
       data
+    );
+
+  return response.data.data;
+};
+
+//Technician Recommendation
+export const getTechnicianRecommendation = async (
+  id: string
+): Promise<TechnicianRecommendation[]> => {
+  const response =
+    await apiClient.get<TechinicanRecommendationResponse>(
+      `/maintenance/${id}/recommend-technician`
     );
 
   return response.data.data;
