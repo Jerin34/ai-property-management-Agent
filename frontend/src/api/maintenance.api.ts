@@ -16,6 +16,8 @@ interface TechinicanRecommendationResponse{
   message?:string
   data:TechnicianRecommendation[]
 }
+import type { RecurringMaintenance } from "../types/recurring-maintenance.types";
+import type { RecurringMaintenanceResponse } from "../types/maintenance.api.types";
 
 /*
  * Get maintenance requests
@@ -163,6 +165,16 @@ export const getTechnicianRecommendation = async (
   const response =
     await apiClient.get<TechinicanRecommendationResponse>(
       `/maintenance/${id}/recommend-technician`
+    );
+
+  return response.data.data;
+};
+export const getRecurringMaintenance = async (
+  id: string
+): Promise<RecurringMaintenance> => {
+  const response =
+    await apiClient.get<RecurringMaintenanceResponse>(
+      `/maintenance/${id}/recurring`
     );
 
   return response.data.data;

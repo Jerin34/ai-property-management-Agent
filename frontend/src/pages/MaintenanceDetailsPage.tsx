@@ -1,105 +1,123 @@
-import {useState,useEffect} from 'react';
-import {useParams} from 'react-router-dom';
-import { getMaintenanceById, getTechnicianRecommendation ,assignTechnician} from '../api/maintenance.api';
-import type { Maintenance } from '../types/maintenance.types';
-import type { TechnicianRecommendation } from '../types/technician.types';
-import TechnicianRecommendations from '../components/TechnicianRecommendation';
-import { useAuth } from '../context/Authcontext';
-function MaintenanceDetailsPage() {
-    const { id } = useParams();
-    const { user } = useAuth();
-    const [maintenance,setMaintenance] = useState<Maintenance | null>(null);
-    const [isLoading,setIsLoading] = useState(true);
-    const [error,setError] = useState<string | null>(null);
-    const [recommendations,setRecommendations] = useState<TechnicianRecommendation[]>([]);
-    const [isRecommendationLoading,setIsRecommendationLoading] = useState(true);
-    const [isAssigning,setIsAssigning] = useState(false);
-    useEffect(() =>{
-        const fetchMaintenance = async () =>{
-            if(!id){
-                setError("Maintenance request ID is missing.");
-                setIsLoading(false);
-                 return ;
-            }
-            try{
-                setIsLoading(true);
-                setError(null);
-                const data = await getMaintenanceById(id);
-                setMaintenance(data);
-                if(user?.role === 'MANAGER'){
-                  try{
-                    setIsRecommendationLoading(true)
-                    const recommendationData = await getTechnicianRecommendation(id);
-                    setRecommendations(recommendationData);
-                  }catch(err){
-                    console.log("Error loading technician recommendation",err);
-                  }
-                  finally{
-                    setIsRecommendationLoading(false)
-                  }
-                }
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import {
+  getMaintenanceById,
+  getTechnicianRecommendation,
+  assignTechnician,
+  getRecurringMaintenance,
+} from "../api/maintenance.api";
+import type { Maintenance } from "../types/maintenance.types";
+import type { TechnicianRecommendation } from "../types/technician.types";
+import TechnicianRecommendations from "../components/TechnicianRecommendation";
+import { useAuth } from "../context/Authcontext";
+import type { RecurringMaintenance as RecurringMaintenanceData } from "../types/recurring-maintenance.types";
+import RecurringMaintenance from "../components/RecurringMaintenaceCard";
 
-            }
-            catch(err){
-                console.log("Error loading maintenance requests",err);
-                setError("Failed to load maintenance requests")
-            }
-            finally{
-                setIsLoading(false);
-            }
+function MaintenanceDetailsPage() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<
+    TechnicianRecommendation[]
+  >([]);
+  const [isRecommendationLoading, setIsRecommendationLoading] = useState(true);
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [recurringData, setRecurringData] =
+    useState<RecurringMaintenanceData | null>(null);
+  const [isRecurringLoading, setIsRecurringLoading] = useState(false);
+  useEffect(() => {
+    const fetchMaintenance = async () => {
+      if (!id) {
+        setError("Maintenance request ID is missing.");
+        setIsLoading(false);
+        return;
+      }
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getMaintenanceById(id);
+        setMaintenance(data);
+        if (user?.role === "MANAGER") {
+          try {
+            setIsRecurringLoading(true);
+
+            const recurring = await getRecurringMaintenance(id);
+
+            setRecurringData(recurring);
+          } catch (error) {
+            console.error("Failed to load recurring maintenance:", error);
+          } finally {
+            setIsRecurringLoading(false);
+          }
         }
-        fetchMaintenance();
-    },[id,user])
-    if(isLoading){
-       return <p>Loading.........</p>
-    }
-    if(error){
-        return <p>{error}</p>
-    }
-    if(!maintenance){
-        return <p>Maintenance request not found</p>
-    }
-    return(
-        <div>
-            <h1>Maintenance Request</h1>
-            <h2>{maintenance.title}</h2>
-            <h3>Description</h3>
-            <p>{maintenance.description}</p>
-            <h3>AI Summary</h3>
-            <p>{maintenance.aiSummary===null?"No summary available":maintenance?.aiSummary}</p>
-            <h3>Request Information</h3>
-            <p>
-                <strong>Priority:</strong>{" "}{maintenance.priority}
-            </p>
-            <p>
-                <strong>Status:</strong>{" "}{maintenance.status}
-            </p>
-            <p>
+        if (user?.role === "MANAGER") {
+          try {
+            setIsRecommendationLoading(true);
+            const recommendationData = await getTechnicianRecommendation(id);
+            setRecommendations(recommendationData);
+          } catch (err) {
+            console.log("Error loading technician recommendation", err);
+          } finally {
+            setIsRecommendationLoading(false);
+          }
+        }
+      } catch (err) {
+        console.log("Error loading maintenance requests", err);
+        setError("Failed to load maintenance requests");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchMaintenance();
+  }, [id, user]);
+  if (isLoading) {
+    return <p>Loading.........</p>;
+  }
+  if (error) {
+    return <p>{error}</p>;
+  }
+  if (!maintenance) {
+    return <p>Maintenance request not found</p>;
+  }
+  return (
+    <div>
+      <h1>Maintenance Request</h1>
+      <h2>{maintenance.title}</h2>
+      <h3>Description</h3>
+      <p>{maintenance.description}</p>
+      <h3>AI Summary</h3>
+      <p>
+        {maintenance.aiSummary === null
+          ? "No summary available"
+          : maintenance?.aiSummary}
+      </p>
+      <h3>Request Information</h3>
+      <p>
+        <strong>Priority:</strong> {maintenance.priority}
+      </p>
+      <p>
+        <strong>Status:</strong> {maintenance.status}
+      </p>
+      <p>
         <strong>Escalation Level:</strong>{" "}
         {maintenance.esclationLevel ?? "NONE"}
       </p>
       <h3>Property</h3>
-        {typeof maintenance.property === "string" ? (
+      {typeof maintenance.property === "string" ? (
         <p>{maintenance.property}</p>
       ) : (
-        <p>
-          {maintenance.property.name ??
-            maintenance.property._id}
-        </p>
+        <p>{maintenance.property.name ?? maintenance.property._id}</p>
       )}
       <h3>Tenant</h3>
       {typeof maintenance.tenant === "string" ? (
         <p>{maintenance.tenant}</p>
       ) : (
         <div>
-          <p>
-            {maintenance.tenant.name ??
-              maintenance.tenant._id}
-          </p>
+          <p>{maintenance.tenant.name ?? maintenance.tenant._id}</p>
 
-          {maintenance.tenant.email && (
-            <p>{maintenance.tenant.email}</p>
-          )}
+          {maintenance.tenant.email && <p>{maintenance.tenant.email}</p>}
         </div>
       )}
       <h3>Technician</h3>
@@ -109,10 +127,7 @@ function MaintenanceDetailsPage() {
         <p>{maintenance.technician}</p>
       ) : (
         <div>
-          <p>
-            {maintenance.technician.name ??
-              maintenance.technician._id}
-          </p>
+          <p>{maintenance.technician.name ?? maintenance.technician._id}</p>
 
           {maintenance.technician.email && (
             <p>{maintenance.technician.email}</p>
@@ -120,7 +135,7 @@ function MaintenanceDetailsPage() {
         </div>
       )}
       <h3>Costs</h3>
-        <p>
+      <p>
         <strong>Estimated Cost:</strong>{" "}
         {maintenance.estimatedCost ?? "Not available"}
       </p>
@@ -131,62 +146,61 @@ function MaintenanceDetailsPage() {
       </p>
 
       <p>
-        <strong>Labor Cost:</strong>{" "}
-        {maintenance.laborCost ?? "Not available"}
+        <strong>Labor Cost:</strong> {maintenance.laborCost ?? "Not available"}
       </p>
 
       <p>
         <strong>Material Cost:</strong>{" "}
         {maintenance.materialCost ?? "Not available"}
       </p>
- <h3>Dates</h3>
+      <h3>Dates</h3>
 
       <p>
         <strong>Created:</strong>{" "}
-        {new Date(
-          maintenance.createdAt
-        ).toLocaleString()}
+        {new Date(maintenance.createdAt).toLocaleString()}
       </p>
 
       <p>
         <strong>Updated:</strong>{" "}
-        {new Date(
-          maintenance.updatedAt
-        ).toLocaleString()}
+        {new Date(maintenance.updatedAt).toLocaleString()}
       </p>
 
       {maintenance.escaltedAt && (
         <p>
           <strong>Escalated:</strong>{" "}
-          {new Date(
-            maintenance.escaltedAt
-          ).toLocaleString()}
+          {new Date(maintenance.escaltedAt).toLocaleString()}
         </p>
       )}
       {user?.role === "MANAGER" && (
-  <TechnicianRecommendations
-    recommendations={recommendations}
-    isLoading={isRecommendationLoading}
-    isAssigning={isAssigning}
-    onSelect={
-      async (technicianId) =>{
-        if(!id){
-          return ;
-    };
-    try{
-      setIsAssigning(true);
-      const updatedMaintence = await assignTechnician(id,{technicianId});
-      setMaintenance(updatedMaintence);
-    }catch(err){
-      console.log('Technician Assignement error',err)
-      
-    }finally{
-      setIsAssigning(false);      
-    };
-    }}
+        <TechnicianRecommendations
+          recommendations={recommendations}
+          isLoading={isRecommendationLoading}
+          isAssigning={isAssigning}
+          onSelect={async (technicianId) => {
+            if (!id) {
+              return;
+            }
+            try {
+              setIsAssigning(true);
+              const updatedMaintence = await assignTechnician(id, {
+                technicianId,
+              });
+              setMaintenance(updatedMaintence);
+            } catch (err) {
+              console.log("Technician Assignement error", err);
+            } finally {
+              setIsAssigning(false);
+            }
+          }}
+        />
+      )}
+      {user?.role === "MANAGER" && (
+  <RecurringMaintenance
+    data={recurringData}
+    isLoading={isRecurringLoading}
   />
 )}
-        </div>
-    )
+    </div>
+  );
 }
-export default MaintenanceDetailsPage
+export default MaintenanceDetailsPage;
