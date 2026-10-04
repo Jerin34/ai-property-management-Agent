@@ -21,12 +21,12 @@ router.get(
     ),
     maintainanceController.getMaintnence
 );
-router.get('/:id',authenticate,autihorize(ROLES.Admin,ROLES.Manager,ROLES.Tenant),maintainanceController.getMaintenanceById)
 router.get('/technician/my-requests',
     authenticate,
     autihorize(ROLES.Technician),
     maintainanceController.ViewTechnicianReq
 )
+router.get('/:id',authenticate,autihorize(ROLES.Admin,ROLES.Manager,ROLES.Tenant,ROLES.Technician),maintainanceController.getMaintenanceById)
 router.get(
     "/:id/recurring",
     authenticate,

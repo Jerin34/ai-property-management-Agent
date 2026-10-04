@@ -110,6 +110,24 @@ export const getMaintenanceById = async(req:Request,res:Response):Promise<void> 
     });
     return;
 }
+if (user.role === ROLES.Technician) {
+    if (
+        !maintenance.technician ||
+        maintenance.technician._id.toString() !== user.userId
+    ) {
+        res.status(403).json({
+            success: false,
+            message: "You are not assigned to this maintenance request",
+        });
+        return;
+    }
+
+    res.status(200).json({
+        success: true,
+        data: maintenance,
+    });
+    return;
+}
         }
 
         catch(err){

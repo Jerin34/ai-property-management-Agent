@@ -80,9 +80,13 @@ export const updateMaintenanceStatus = async(maintenaceId:string,technicianId:st
     if(!maintenance){
         throw new Error("Maintenance Request Not Found")
     }
-    if(!maintenance.technician || maintenance.technician._id.toString() != technicianId){
-        throw new Error("You are not assigned to this maintenance request")
-    }
+    if (
+    !maintenance.technician ||
+    maintenance.technician.toString() !== technicianId
+) {
+    throw new Error("You are not assigned to this maintenance request");
+}
+   
     maintenance.status = status;
     await maintenance.save();
     return maintenance;

@@ -12,6 +12,7 @@ import PropertyDetailsPage from "../pages/PropertyDetailsPage.tsx";
 import MaintenanceDetailsPage from "../pages/MaintenanceDetailsPage.tsx";
 import CreateMaintenancePage from "../pages/CreateMaintenancePage.tsx";
 
+import TechnicianMaintenancePage from "../pages/TechnicianMaintenancePage.tsx";
 function ManagerDashboardPage() {
   return <h1>Manager Dashboard Page</h1>;
 }
@@ -52,6 +53,14 @@ function AppRoutes() {
               path="/maintenance/:id"
               element={<MaintenanceDetailsPage />}
             />
+
+            {/* {Technician} */}
+            <Route element={<RoleRoute allowedRoles={["TECHNICIAN"]} />}>
+  <Route
+    path="/technician/maintenance"
+    element={<TechnicianMaintenancePage />}
+  />
+</Route>
 
             {/* Admin / Manager only */}
             <Route

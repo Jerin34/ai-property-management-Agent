@@ -179,3 +179,9 @@ export const getRecurringMaintenance = async (
 
   return response.data.data;
 };
+export const getTechnicianMaintenanceRequests = async():Promise<Maintenance[]>=>{
+  const response = await apiClient.get<MaintenanceListResponse>(
+    `/maintenance/technician/my-requests`
+  )
+  return response.data.data
+}
