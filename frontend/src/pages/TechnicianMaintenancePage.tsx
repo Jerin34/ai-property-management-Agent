@@ -1,8 +1,9 @@
  import { useEffect,useState } from "react";
  import { getTechnicianMaintenanceRequests } from "../api/maintenance.api";
+ import { useNavigate } from "react-router-dom";
  import type { Maintenance } from "../types/maintenance.types";
-
  function TechnicianMaintenancePage(){
+    const navigate = useNavigate();
     const [maintenanceRequest,setGetMaintenanceRequests] = useState<Maintenance[]>([])
     const [ isloading,setIsLoading] = useState(true);
     const [error , setError] =useState<string | null>(null);
@@ -41,11 +42,13 @@ if(error){
                         <p>Status: {maintenance.status}</p>
                         <p>Priority: {maintenance.priority}</p>
                         <p>Category: {maintenance.category}</p>
+                        <button onClick={() => navigate(`/maintenance/${maintenance._id}`)}>View Details</button>
                     </div>
              ) ))
         }
     </div>
 
     )
+    
  }
  export default TechnicianMaintenancePage;

@@ -5,6 +5,7 @@ import {
   getTechnicianRecommendation,
   assignTechnician,
   getRecurringMaintenance,
+  updateMaintenanceStatus,
 } from "../api/maintenance.api";
 import type { Maintenance } from "../types/maintenance.types";
 import type { TechnicianRecommendation } from "../types/technician.types";
@@ -27,6 +28,7 @@ function MaintenanceDetailsPage() {
   const [recurringData, setRecurringData] =
     useState<RecurringMaintenanceData | null>(null);
   const [isRecurringLoading, setIsRecurringLoading] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   useEffect(() => {
     const fetchMaintenance = async () => {
       if (!id) {
@@ -72,6 +74,30 @@ function MaintenanceDetailsPage() {
     };
     fetchMaintenance();
   }, [id, user]);
+ 
+  const handleStatusUpdate = async (
+  status: "IN_PROGRESS" | "COMPLETED"
+) => {
+  if (!maintenance) {
+    return;
+  }
+
+  try {
+    setIsUpdatingStatus(true);
+
+    const updatedMaintenance = await updateMaintenanceStatus(
+      maintenance._id,
+      { status }
+    );
+
+    setMaintenance(updatedMaintenance);
+  } catch (err) {
+    console.log("Failed to update maintenance status", err);
+  } finally {
+    setIsUpdatingStatus(false);
+  }
+};
+
   if (isLoading) {
     return <p>Loading.........</p>;
   }
@@ -94,6 +120,27 @@ function MaintenanceDetailsPage() {
           : maintenance?.aiSummary}
       </p>
       <h3>Request Information</h3>
+     {user?.role === "TECHNICIAN" && (
+  <div>
+    {maintenance.status === "OPEN" && (
+      <button
+        onClick={() => handleStatusUpdate("IN_PROGRESS")}
+        disabled={isUpdatingStatus}
+      >
+        {isUpdatingStatus ? "Updating..." : "Start Work"}
+      </button>
+    )}
+
+    {maintenance.status === "IN_PROGRESS" && (
+      <button
+        onClick={() => handleStatusUpdate("COMPLETED")}
+        disabled={isUpdatingStatus}
+      >
+        {isUpdatingStatus ? "Updating..." : "Complete Work"}
+      </button>
+    )}
+  </div>
+)}
       <p>
         <strong>Priority:</strong> {maintenance.priority}
       </p>
