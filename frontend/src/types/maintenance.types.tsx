@@ -83,3 +83,19 @@ export interface AssignTechnicianInput {
 export interface UpdateMaintenanceStatusInput {
   status: "IN_PROGRESS" | "COMPLETED";
 }
+export interface MaintenanceUpdates{
+  _id:string;
+  maintenance:string;
+  user:string | {
+    _id:string;
+    name?:string;
+    email?:string;
+    phone?:string;
+  };
+  message:string;
+  createdAt:string;
+  updatedAt:string;
+}
+export interface createMaintenanceUpdateInput{
+  message:string;
+}

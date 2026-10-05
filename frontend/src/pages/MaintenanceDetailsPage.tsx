@@ -6,10 +6,13 @@ import {
   assignTechnician,
   getRecurringMaintenance,
   updateMaintenanceStatus,
+  getMaintenanceUpdates
 } from "../api/maintenance.api";
-import type { Maintenance } from "../types/maintenance.types";
+import type { Maintenance,MaintenanceUpdates } from "../types/maintenance.types";
 import type { TechnicianRecommendation } from "../types/technician.types";
 import TechnicianRecommendations from "../components/TechnicianRecommendation";
+import MaintenancesUpdates from "../components/MaintenanceUpdates";
+import AddMaintenanceUpdate from "../components/AddMaintenanceUpdates";
 import { useAuth } from "../context/Authcontext";
 import type { RecurringMaintenance as RecurringMaintenanceData } from "../types/recurring-maintenance.types";
 import RecurringMaintenance from "../components/RecurringMaintenaceCard";
@@ -23,6 +26,7 @@ function MaintenanceDetailsPage() {
   const [recommendations, setRecommendations] = useState<
     TechnicianRecommendation[]
   >([]);
+  const [updates,setUpdates] = useState<MaintenanceUpdates[]>([]);
   const [isRecommendationLoading, setIsRecommendationLoading] = useState(true);
   const [isAssigning, setIsAssigning] = useState(false);
   const [recurringData, setRecurringData] =
@@ -41,6 +45,8 @@ function MaintenanceDetailsPage() {
         setError(null);
         const data = await getMaintenanceById(id);
         setMaintenance(data);
+        const updatesData = await getMaintenanceUpdates(id);
+        setUpdates(updatesData);
         if (user?.role === "MANAGER") {
           try {
             setIsRecurringLoading(true);
@@ -74,6 +80,7 @@ function MaintenanceDetailsPage() {
     };
     fetchMaintenance();
   }, [id, user]);
+
  
   const handleStatusUpdate = async (
   status: "IN_PROGRESS" | "COMPLETED"
@@ -107,6 +114,11 @@ function MaintenanceDetailsPage() {
   if (!maintenance) {
     return <p>Maintenance request not found</p>;
   }
+    const isAssignedTechnician =
+    user?.role === "TECHNICIAN" &&
+    maintenance.technician &&
+    typeof maintenance.technician !== "string" &&
+    maintenance.technician._id === user.id;
   return (
     <div>
       <h1>Maintenance Request</h1>
@@ -245,6 +257,19 @@ function MaintenanceDetailsPage() {
   <RecurringMaintenance
     data={recurringData}
     isLoading={isRecurringLoading}
+  />
+)}
+<MaintenancesUpdates updates={updates} />
+{isAssignedTechnician && (
+  <AddMaintenanceUpdate
+    maintenanceId={maintenance._id}
+    onUpdateCreated={async () => {
+      const updatedData = await getMaintenanceUpdates(
+        maintenance._id
+      );
+
+      setUpdates(updatedData);
+    }}
   />
 )}
     </div>

@@ -4,11 +4,15 @@ import type {
   CreateMaintenanceInput,
   AssignTechnicianInput,
   UpdateMaintenanceStatusInput,
+MaintenanceUpdates,
+createMaintenanceUpdateInput
 } from "../types/maintenance.types";
 
 import type {
   MaintenanceListResponse,
   MaintenanceResponse,
+  MaintenanceUpdatesResponse,
+  createMaintenanceUpdateResponse
 } from "../types/maintenance.api.types";
 import type { TechnicianRecommendation } from "../types/technician.types";
 interface TechinicanRecommendationResponse{
@@ -18,6 +22,7 @@ interface TechinicanRecommendationResponse{
 }
 import type { RecurringMaintenance } from "../types/recurring-maintenance.types";
 import type { RecurringMaintenanceResponse } from "../types/maintenance.api.types";
+
 
 /*
  * Get maintenance requests
@@ -184,4 +189,12 @@ export const getTechnicianMaintenanceRequests = async():Promise<Maintenance[]>=>
     `/maintenance/technician/my-requests`
   )
   return response.data.data
+}
+export const getMaintenanceUpdates = async(id:string):Promise<MaintenanceUpdates[]> =>{
+  const response = await apiClient.get<MaintenanceUpdatesResponse>(`/maintenance/${id}/updates`);
+  return response.data.data
+}
+export const createMaintenanceUpdate = async(id:string,data:createMaintenanceUpdateInput):Promise<createMaintenanceUpdateResponse> =>{
+  const response =  await apiClient.post<createMaintenanceUpdateResponse>(`/maintenance/${id}/updates`,data);
+  return response.data;
 }

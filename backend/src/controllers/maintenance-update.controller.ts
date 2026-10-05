@@ -13,16 +13,24 @@ export const createMaintenaceUpdate = async (req:Request,res:Response):Promise<v
         res.status(201).json({success:true,message:"Maintenace update created successfully"});
     }
 catch(err){
-    if(err instanceof Error && err.message === 'You are not allowed to update this request'){
-        res.status(401).json({success:false,message:"You are not allowed to update this request"});
-    }
-        if(err instanceof Error && err.message === 'Maintenance request not found'){
-            res.status(404).json({success:false,message:"Maintenance request not found"});
-            return ;
-        }
-        res.status(500).json({success:false,message:"Internal server error"});
-    }
+  if (
+    err instanceof Error &&
+    (
+        err.message === "Only technicians can create maintenance updates" ||
+        err.message === "You are not allowed to update this request"
+    )
+) {
+    res.status(403).json({
+        success: false,
+        message: err.message
+    });
+    return;
+}
+    res.status(500).json({
+        success:false,message:"Internal server Error"
+    })
     
+}
 }
 export const viewMaintenaceReq = async(req:Request,res:Response):Promise<void> =>{
     try{
