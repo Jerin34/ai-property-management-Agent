@@ -1,4 +1,4 @@
-import Maintaince from "../models/maintenance.model.js";
+import Maintaince from "../models/maintainance.model.js";
 import type { UpdateMaintenanceCostInput } from "../validator/maintenance_cost.validator.js";
 
 export const updateMaintenanceCost = async (

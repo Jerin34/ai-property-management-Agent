@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
-import { updateMaintenanceCost } from '../services/maintenance_cost.services.js'
-import { updateMaintenanceCostSchema } from '../validator/maintenance_cost.validator.js'
+import { updateMaintenanceCost } from "../services/maintenance_cost.services.js";
+import { updateMaintenanceCostSchema } from "../validator/maintenance_cost.validator.js";
 
-export const updateCost = async (req: Request, res: Response): Promise<void> => {
+export const updateCost = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     try {
         const maintenanceId = req.params.id.toString();
 
@@ -26,13 +29,12 @@ export const updateCost = async (req: Request, res: Response): Promise<void> => 
             success: true,
             data: maintenance
         });
-    }
-    catch (err) {
+    } catch (err) {
         console.log(err);
 
         if (
             err instanceof Error &&
-            err.message === 'Maintenance request not found'
+            err.message === "Maintenance request not found"
         ) {
             res.status(404).json({
                 success: false,
@@ -43,7 +45,7 @@ export const updateCost = async (req: Request, res: Response): Promise<void> => 
 
         if (
             err instanceof Error &&
-            err.message === 'You are not allowed to update this request'
+            err.message === "You are not allowed to update this request"
         ) {
             res.status(403).json({
                 success: false,
@@ -65,4 +67,4 @@ export const updateCost = async (req: Request, res: Response): Promise<void> => 
             message: "Internal Server Error"
         });
     }
-}
+};

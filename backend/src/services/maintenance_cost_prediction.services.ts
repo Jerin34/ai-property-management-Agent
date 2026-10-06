@@ -56,6 +56,7 @@ if(!text){
 let result;
 try{
     result = JSON.parse(text);
+    
 }
 catch{
     throw new Error('Ai returned invalid json');
@@ -63,6 +64,12 @@ catch{
 if(typeof result.predictedCost !== 'number' || !["LOW","MEDIUM","HIGH"].includes(result.confidence) || typeof result.reason !== 'string'){
     throw new Error('Ai returned invalid json');
 }
+await Maintenance.findByIdAndUpdate(
+  maintenanceId,
+  {
+    estimatedCost: result.predictedCost
+  }
+);
 return {
     maintenanceId:maintenance._id.toString(),
     predictedCost:result.predictedCost,

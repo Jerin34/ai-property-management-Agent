@@ -6,7 +6,8 @@ import {
   assignTechnician,
   getRecurringMaintenance,
   updateMaintenanceStatus,
-  getMaintenanceUpdates
+  getMaintenanceUpdates,
+  predictMaintenanceCost
 } from "../api/maintenance.api";
 import type { Maintenance,MaintenanceUpdates } from "../types/maintenance.types";
 import type { TechnicianRecommendation } from "../types/technician.types";
@@ -16,7 +17,7 @@ import AddMaintenanceUpdate from "../components/AddMaintenanceUpdates";
 import { useAuth } from "../context/Authcontext";
 import type { RecurringMaintenance as RecurringMaintenanceData } from "../types/recurring-maintenance.types";
 import RecurringMaintenance from "../components/RecurringMaintenaceCard";
-
+import MaintenanceCostForm from "../components/MaintenanceCostForm";
 function MaintenanceDetailsPage() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -33,6 +34,14 @@ function MaintenanceDetailsPage() {
     useState<RecurringMaintenanceData | null>(null);
   const [isRecurringLoading, setIsRecurringLoading] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isPredictingCost, setIsPredictingCost] = useState(false);
+const [costPrediction, setCostPrediction] =
+  useState<{
+    predictedCost: number;
+    confidence: "LOW" | "MEDIUM" | "HIGH";
+    reason: string;
+  } | null>(null);
+
   useEffect(() => {
     const fetchMaintenance = async () => {
       if (!id) {
@@ -81,6 +90,29 @@ function MaintenanceDetailsPage() {
     fetchMaintenance();
   }, [id, user]);
 
+  const handlePredictCost = async () => {
+  if (!maintenance) return;
+
+  try {
+    setIsPredictingCost(true);
+
+    const prediction = await predictMaintenanceCost(
+      maintenance._id
+    );
+
+    setCostPrediction(prediction);
+
+    const updatedMaintenance = await getMaintenanceById(
+      maintenance._id
+    );
+
+    setMaintenance(updatedMaintenance);
+  } catch (err) {
+    console.log("Failed to predict maintenance cost", err);
+  } finally {
+    setIsPredictingCost(false);
+  }
+};
  
   const handleStatusUpdate = async (
   status: "IN_PROGRESS" | "COMPLETED"
@@ -272,6 +304,46 @@ function MaintenanceDetailsPage() {
     }}
   />
 )}
+{isAssignedTechnician && (
+  <MaintenanceCostForm
+    maintenanceId={maintenance._id}
+    onCostUpdate={async () => {
+      const updatedMaintenance = await getMaintenanceById(
+        maintenance._id
+      );
+
+      setMaintenance(updatedMaintenance);
+    }}
+  />
+)}<strong>Estimated Cost:</strong>{" "}
+{maintenance.estimatedCost ?? "Not available"}
+{user?.role === "MANAGER" && (
+  <div>
+    <button
+      onClick={handlePredictCost}
+      disabled={isPredictingCost}
+    >
+      {isPredictingCost
+        ? "Predicting..."
+        : "Predict Cost with AI"}
+    </button>
+
+    {costPrediction && (
+      <div>
+        <p>
+          <strong>AI Confidence:</strong>{" "}
+          {costPrediction.confidence}
+        </p>
+
+        <p>
+          <strong>Reason:</strong>{" "}
+          {costPrediction.reason}
+        </p>
+      </div>
+    )}
+  </div>
+)}
+
     </div>
   );
 }

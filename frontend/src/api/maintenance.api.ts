@@ -20,9 +20,14 @@ interface TechinicanRecommendationResponse{
   message?:string
   data:TechnicianRecommendation[]
 }
+export interface MaintenanceCostPrediction {
+  maintenanceId: string;
+  predictedCost: number;
+  confidence: "LOW" | "MEDIUM" | "HIGH";
+  reason: string;
+}
 import type { RecurringMaintenance } from "../types/recurring-maintenance.types";
 import type { RecurringMaintenanceResponse } from "../types/maintenance.api.types";
-
 
 /*
  * Get maintenance requests
@@ -195,3 +200,20 @@ export const createMaintenanceUpdate = async(id:string,data:createMaintenanceUpd
   const response =  await apiClient.post<createMaintenanceUpdateResponse>(`/maintenance/${id}/updates`,data);
   return response.data;
 }
+export interface MaintenanceCostPrediction {
+  maintenanceId: string;
+  predictedCost: number;
+  confidence: "LOW" | "MEDIUM" | "HIGH";
+  reason: string;
+}
+
+export const predictMaintenanceCost = async (
+  id: string
+): Promise<MaintenanceCostPrediction> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: MaintenanceCostPrediction;
+  }>(`/maintenance_cost/${id}/predict`);
+
+  return response.data.data;
+};

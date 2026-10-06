@@ -25,3 +25,4 @@ export interface createMaintenanceUpdateResponse{
     success: boolean;
     message: string;
 }
+
