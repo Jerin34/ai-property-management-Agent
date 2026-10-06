@@ -142,14 +142,11 @@ export const updateMaintenanceStatus = async (
  * PATCH /api/maintenance/:id/cost
  *
  * Available to:
- * ADMIN
- * MANAGER
+ * TECHNICIAN
  */
 export const updateMaintenanceCost = async (
   id: string,
   data: {
-    estimatedCost?: number;
-    actualCost?: number;
     laborCost?: number;
     materialCost?: number;
   }
