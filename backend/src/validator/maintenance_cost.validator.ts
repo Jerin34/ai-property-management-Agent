@@ -1,28 +1,14 @@
 import { z } from "zod";
 
 export const updateMaintenanceCostSchema = z.object({
-
-    estimatedCost:
-        z.number()
-            .min(0)
-            .optional(),
-
-    actualCost:
-        z.number()
-            .min(0)
-            .optional(),
-
-    laborCost:
-        z.number()
-            .min(0)
-            .optional(),
-
-    materialCost:
-        z.number()
-            .min(0)
-            .optional()
-
-});
+    laborCost: z.number().min(0).optional(),
+    materialCost: z.number().min(0).optional()
+}).refine(
+    data => data.laborCost !== undefined || data.materialCost !== undefined,
+    {
+        message: "At least one cost value is required"
+    }
+);
 
 export type UpdateMaintenanceCostInput =
     z.infer<typeof updateMaintenanceCostSchema>;
