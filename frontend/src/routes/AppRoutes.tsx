@@ -21,33 +21,23 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
 
         {/* All authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Applayout />}>
-
-            <Route
-              path="/dashboard"
-              element={<DashBoardPage />}
-            />
+            <Route path="/dashboard" element={<DashBoardPage />} />
 
             {/* Maintenance is accessible to authenticated roles */}
-            <Route
-              path="/maintenance"
-              element={<MaintenancePage />}
-            />
+            <Route path="/maintenance" element={<MaintenancePage />} />
 
-            <Route
-      element={<RoleRoute allowedRoles={["TENANT"]} />}
-    >
-      <Route
-        path="/maintenance/create"
-        element={<CreateMaintenancePage />}
-      />
-    </Route>
+            <Route element={<RoleRoute allowedRoles={["TENANT"]} />}>
+              <Route
+                path="/maintenance/create"
+                element={<CreateMaintenancePage />}
+              />
+            </Route>
 
             <Route
               path="/maintenance/:id"
@@ -56,37 +46,22 @@ function AppRoutes() {
 
             {/* {Technician} */}
             <Route element={<RoleRoute allowedRoles={["TECHNICIAN"]} />}>
-  <Route
-    path="/technician/maintenance"
-    element={<TechnicianMaintenancePage />}
-  />
-</Route>
-
-            {/* Admin / Manager only */}
-            <Route
-              element={
-                <RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />
-              }
-            >
               <Route
-                path="/management"
-                element={<ManagerDashboardPage />}
-              />
-
-              <Route
-                path="/properties"
-                element={<PropertiesPage />}
-              />
-
-              <Route
-                path="/properties/:id"
-                element={<PropertyDetailsPage />}
+                path="/technician/maintenance"
+                element={<TechnicianMaintenancePage />}
               />
             </Route>
 
+            {/* Admin / Manager only */}
+            <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
+              <Route path="/management" element={<ManagerDashboardPage />} />
+
+              <Route path="/properties" element={<PropertiesPage />} />
+              
+              <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+            </Route>
           </Route>
         </Route>
-
       </Routes>
     </BrowserRouter>
   );
