@@ -11,7 +11,7 @@ import MaintenancePage from "../pages/MaintenancePage.tsx";
 import PropertyDetailsPage from "../pages/PropertyDetailsPage.tsx";
 import MaintenanceDetailsPage from "../pages/MaintenanceDetailsPage.tsx";
 import CreateMaintenancePage from "../pages/CreateMaintenancePage.tsx";
-
+import NotificationPage from "../pages/NotificationPage.tsx";
 import TechnicianMaintenancePage from "../pages/TechnicianMaintenancePage.tsx";
 function ManagerDashboardPage() {
   return <h1>Manager Dashboard Page</h1>;
@@ -31,7 +31,7 @@ function AppRoutes() {
 
             {/* Maintenance is accessible to authenticated roles */}
             <Route path="/maintenance" element={<MaintenancePage />} />
-
+            <Route path="/notification" element={<NotificationPage />} />
             <Route element={<RoleRoute allowedRoles={["TENANT"]} />}>
               <Route
                 path="/maintenance/create"
