@@ -4,7 +4,7 @@ import {
     markNotificationsAsRead
 } from "../api/notification.api";
 import type { Notification } from "../types/notification.types";
-
+import NotificationPreferences from "../components/NotificationPreferences";
 const NotificationPage = () => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
@@ -156,6 +156,7 @@ const NotificationPage = () => {
                     ))}
                 </div>
             )}
+            <NotificationPreferences />
         </div>
     );
 };
