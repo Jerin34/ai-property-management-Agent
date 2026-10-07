@@ -4,7 +4,11 @@ import { useAuth } from "../context/Authcontext";
 
 function Sidebar(){
     const { user ,logout} = useAuth();
-    const visibleItems = NavigationItems.filter((item) => item.allowedRoles.includes(user?.role));
+   const visibleItems = NavigationItems.filter(
+    (item) =>
+        !item.allowedRoles ||
+        (user?.role && item.allowedRoles.includes(user.role))
+);
     return(
         <aside>
             <h1>Property Management</h1>
