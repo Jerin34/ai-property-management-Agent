@@ -22,6 +22,11 @@ export const NavigationItems : NavigationItem[] = [
         allowedRoles:["ADMIN","MANAGER"]
     },
     {
+        label:"Cost Analytics",
+        path:"/maintenance/cost-analytics",
+        allowedRoles:["ADMIN","MANAGER"]
+    },
+    {
         label:'notification',
         path:'/notification',
         allowedRoles:["ADMIN","MANAGER","TECHNICIAN","TENANT"]
