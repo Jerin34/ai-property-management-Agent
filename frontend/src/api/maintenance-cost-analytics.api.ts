@@ -10,7 +10,7 @@ export const getMaintenanceCostAnalytics =
     async (): Promise<MaintenanceCostAnalytics> => {
         const response =
             await apiClient.get<MaintenanceCostAnalyticsResponse>(
-                "/maintenance_cost/analytics"
+                "/maintenance_cost/"
             );
 
         return response.data.data;
