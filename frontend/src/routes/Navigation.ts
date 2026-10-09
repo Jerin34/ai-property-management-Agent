@@ -36,5 +36,10 @@ export const NavigationItems : NavigationItem[] = [
   path: "/technician/maintenance",
   allowedRoles: ["TECHNICIAN"]
 },
+{
+    label: "Maintenance Schedules",
+    path: "/maintenance/schedules",
+    allowedRoles: ["ADMIN", "MANAGER"]
+},
 
 ]

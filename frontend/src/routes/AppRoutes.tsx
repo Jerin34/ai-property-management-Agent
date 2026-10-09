@@ -15,9 +15,9 @@ import NotificationPage from "../pages/NotificationPage.tsx";
 import TechnicianMaintenancePage from "../pages/TechnicianMaintenancePage.tsx";
 import MaintenanceSLAPage from "../pages/MaintenanceSLAPage.tsx";
 import MaintenanceCostAnalyticsPage from "../pages/MaintenanceCostAnalyticsPage.tsx";
-function ManagerDashboardPage() {
-  return <h1>Manager Dashboard Page</h1>;
-}
+import MaintenanceSchedulerPage from "../pages/MaintenanceSchedulePage.tsx";
+import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePage.tsx";
+
 
 function AppRoutes() {
   return (
@@ -33,7 +33,10 @@ function AppRoutes() {
             <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
               <Route path="/analytics" element={<DashBoardPage />} />
               <Route path="/maintenance/sla" element={<MaintenanceSLAPage />} />
-              <Route path="/maintenance/cost-analytics" element={<MaintenanceCostAnalyticsPage />} />
+              <Route
+                path="/maintenance/cost-analytics"
+                element={<MaintenanceCostAnalyticsPage />}
+              />
             </Route>
 
             {/* Maintenance is accessible to authenticated roles */}
@@ -61,10 +64,19 @@ function AppRoutes() {
 
             {/* Admin / Manager only */}
             <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
-              <Route path="/management" element={<ManagerDashboardPage />} />
 
               <Route path="/properties" element={<PropertiesPage />} />
-              
+
+              <Route
+                path="/maintenance/schedules"
+                element={<MaintenanceSchedulerPage />}
+              />
+
+              <Route
+                path="/maintenance/schedules/create"
+                element={<CreateMaintenanceSchedulePage />}
+              />
+
               <Route path="/properties/:id" element={<PropertyDetailsPage />} />
             </Route>
           </Route>
