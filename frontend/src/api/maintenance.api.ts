@@ -26,6 +26,7 @@ export interface MaintenanceCostPrediction {
   confidence: "LOW" | "MEDIUM" | "HIGH";
   reason: string;
 }
+
 import type { RecurringMaintenance } from "../types/recurring-maintenance.types";
 import type { RecurringMaintenanceResponse } from "../types/maintenance.api.types";
 
@@ -200,12 +201,7 @@ export const createMaintenanceUpdate = async(id:string,data:createMaintenanceUpd
   const response =  await apiClient.post<createMaintenanceUpdateResponse>(`/maintenance/${id}/updates`,data);
   return response.data;
 }
-export interface MaintenanceCostPrediction {
-  maintenanceId: string;
-  predictedCost: number;
-  confidence: "LOW" | "MEDIUM" | "HIGH";
-  reason: string;
-}
+
 
 export const predictMaintenanceCost = async (
   id: string
