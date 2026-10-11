@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 import {
 
@@ -12,6 +13,7 @@ import type {
 } from "../types/maintenance-scheduler.types";
 
 function MaintenanceSchedulerPage() {
+    const navigate = useNavigate();
 
     const [schedules, setSchedules] =
         useState<MaintenanceSchedule[]>([]);
@@ -175,6 +177,8 @@ useEffect(() => {
                 </tbody>
 
             </table>
+            <h1>Preventive Maintenance Scheduler</h1>
+            <button onClick={() => navigate("/maintenance/schedules/create")}>Create Schedule</button>
 
         </div>
     );

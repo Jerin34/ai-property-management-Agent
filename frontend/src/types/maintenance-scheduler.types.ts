@@ -1,4 +1,4 @@
-export type MaintenanceFrequency = | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY" | "YEARLY";
+export type MaintenanceFrequency = | "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" |"YEARLY" ;
 export type MaintenanceScheduleCategroy = | "PLUMBING" | "ELECTRICAL" | "HVAC" | "APPLIANCE" | "STRUCTURAL" | "OTHER";
 
 export interface MaintenanceSchedule {
