@@ -16,6 +16,10 @@ export interface IUser{
     isActive:boolean;
     skills?:string[];
     location?:IUserLocation;
+ subscriptionStatus :| "INACTIVE" | "ACTOVE" | "PAST_DUE" | "CANCELLED";
+ subscriptionId?:string;
+ subscriptionCurrentPeriodEnd?:Date;
+
 }
 const  userSchema  =  new Schema<IUser>({
 name:{
@@ -66,6 +70,17 @@ location:{
     },
     updatedAt:{
         type:Date
+    },
+    subscriptionStatus:{
+        type: String,
+        enum:["INACTIVE","ACTOVE","PAST_DUE","CANCELLED"],
+        default:'INACTIVE'
+    },
+    subscriptionId:{
+        type:String,
+    },
+    subscriptionCurrentPeriodEnd:{
+            type:Date,
     }
 }
 },

@@ -6,11 +6,19 @@
     if(JWT_SECRET === undefined) throw new Error('JWT_SECRET is not defined')
     const GEMINI_API_KEY =  process.env.GEMINI_API_KEY;
     if(GEMINI_API_KEY === undefined)  throw new Error('Gemini api key not found')
-    const env ={
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
+if(RAZORPAY_KEY_ID === undefined) throw new Error('RAZORPAY_KEY_ID is not defined')
+    const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+if(RAZORPAY_KEY_SECRET === undefined) throw new Error('RAZORPAY_KEY_SECRET is not defined')
+    const RAZORPAY_PLAN_ID = process.env.RAZORPAY_PLAN_ID
+if(RAZORPAY_PLAN_ID === undefined) throw new Error('RAZORPAY_PLAN_ID is not defined')
+    const env = {
         PORT,
         MONGODB_URI,
         JWT_SECRET,
-        GEMINI_API_KEY
+        GEMINI_API_KEY,
+        RAZORPAY_KEY_ID,
+        RAZORPAY_KEY_SECRET,
+        RAZORPAY_PLAN_ID
     }
-
     export default env
