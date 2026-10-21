@@ -300,6 +300,11 @@ export const getManagerInsights = async (
 
 export const recommendTechnician = async(req:Request,res:Response):Promise<void> =>{
     try{
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
         const maintenaceId = req.params.id.toString();
         const maintenace = await Maintenance.findById(maintenaceId)
         if(!maintenace){
@@ -314,6 +319,16 @@ export const recommendTechnician = async(req:Request,res:Response):Promise<void>
             res.status(404).json({
                 success: false,
                 message: "Property not found"
+            });
+            return;
+        }
+        if (
+            user.role !== ROLES.Admin &&
+            property.manager.toString() !== user.userId
+        ) {
+            res.status(403).json({
+                success: false,
+                message: "You are not allowed to access this maintenance request"
             });
             return;
         }
@@ -350,12 +365,34 @@ export const detectRecurring = async (
     res: Response
 ): Promise<void> => {
     try {
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
+
         const maintenance = await Maintenance.findById(req.params.id);
 
         if (!maintenance) {
             res.status(404).json({
                 success: false,
                 message: "Maintenance Request Not Found"
+            });
+            return;
+        }
+
+        const property = await Property.findById(maintenance.property);
+        if (!property) {
+            res.status(404).json({ success: false, message: "Property not found" });
+            return;
+        }
+        if (
+            user.role !== ROLES.Admin &&
+            property.manager.toString() !== user.userId
+        ) {
+            res.status(403).json({
+                success: false,
+                message: "You are not allowed to access this maintenance request"
             });
             return;
         }
@@ -383,7 +420,12 @@ export const detectRecurring = async (
 export const getMaintenanceAlert = async(req:Request,res:Response):Promise<void> =>{
     try{
    
-    const alerts = await MaintenanceAlertService()
+    const user = req.user;
+    if (!user) {
+        res.status(401).json({ success: false, message: "Authentication required" });
+        return;
+    }
+    const alerts = await MaintenanceAlertService(user.userId, user.role)
     res.status(200).json({
         success:true,data:alerts
     })

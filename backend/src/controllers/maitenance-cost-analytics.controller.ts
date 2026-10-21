@@ -5,22 +5,25 @@ export const maintenanceCostAnalytics = async (
     req: Request,
     res: Response
 ): Promise<void> => {
-
     try {
+        const user = req.user;
 
-        const analytics = await getMaintenanceCostAnalytics();
+        if (!user) {
+            res.status(401).json({
+                success: false,
+                message: "Authentication required"
+            });
+            return;
+        }
+
+        const analytics = await getMaintenanceCostAnalytics(user.userId, user.role);
 
         res.status(200).json({
             success: true,
             data: analytics
         });
-
     } catch (err) {
-
-        console.error(
-            "MAINTENANCE COST ANALYTICS ERROR:",
-            err
-        );
+        console.error("MAINTENANCE COST ANALYTICS ERROR:", err);
 
         res.status(500).json({
             success: false,

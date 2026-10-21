@@ -1,12 +1,22 @@
 import Maintaince from "../models/maintenance.model.js";
 import Property from "../models/property.models.js";
 import { MaintenanceCostAnalytics } from "../types/maintenance_cost_analytics.types.js";
+import { ROLES, type Role } from "../constants/roles.js";
 
+export const getMaintenanceCostAnalytics = async (
+    userId: string,
+    role: Role
+): Promise<MaintenanceCostAnalytics> => {
+    // Scope both the requests and property lookup to the authenticated manager.
+    const properties = role === ROLES.Admin
+        ? await Property.find()
+        : await Property.find({ manager: userId });
 
-export const getMaintenanceCostAnalytics =
-    async (): Promise<MaintenanceCostAnalytics> => {
+    const propertyIds = properties.map(property => property._id);
 
-    const maintenanceRequests = await Maintaince.find();
+    const maintenanceRequests = role === ROLES.Admin
+        ? await Maintaince.find()
+        : await Maintaince.find({ property: { $in: propertyIds } });
 
     let totalEstimatedCost = 0;
     let totalActualCost = 0;
@@ -14,11 +24,9 @@ export const getMaintenanceCostAnalytics =
     let totalMaterialCost = 0;
 
     const categoryCosts: Record<string, number> = {};
-
     let mostExpensiveRequest: MaintenanceCostAnalytics["mostExpensiveRequest"] = null;
 
     for (const request of maintenanceRequests) {
-
         const estimatedCost = request.estimatedCost ?? 0;
         const actualCost = request.actualCost ?? 0;
         const laborCost = request.laborCost ?? 0;
@@ -29,15 +37,12 @@ export const getMaintenanceCostAnalytics =
         totalLaborCost += laborCost;
         totalMaterialCost += materialCost;
 
-        // Category cost
         categoryCosts[request.category] =
             (categoryCosts[request.category] ?? 0) + actualCost;
 
-        // Most expensive request
         if (
             actualCost > 0 &&
-            (!mostExpensiveRequest ||
-            actualCost > mostExpensiveRequest.actualCost)
+            (!mostExpensiveRequest || actualCost > mostExpensiveRequest.actualCost)
         ) {
             mostExpensiveRequest = {
                 maintenanceId: request._id.toString(),
@@ -47,35 +52,29 @@ export const getMaintenanceCostAnalytics =
         }
     }
 
-    const requestsWithActualCost =
-        maintenanceRequests.filter(
-            request => (request.actualCost ?? 0) > 0
-        ).length;
+    const requestsWithActualCost = maintenanceRequests.filter(
+        request => (request.actualCost ?? 0) > 0
+    ).length;
 
-    const averageActualCost =
-        requestsWithActualCost > 0
-            ? totalActualCost / requestsWithActualCost
-            : 0;
+    const averageActualCost = requestsWithActualCost > 0
+        ? totalActualCost / requestsWithActualCost
+        : 0;
 
-    // Property cost calculation
     const propertyCosts: Record<string, number> = {};
 
     for (const request of maintenanceRequests) {
-
         const propertyId = request.property.toString();
-        const actualCost = request.actualCost ?? 0;
-
         propertyCosts[propertyId] =
-            (propertyCosts[propertyId] ?? 0) + actualCost;
+            (propertyCosts[propertyId] ?? 0) + (request.actualCost ?? 0);
     }
 
-    const propertyIds = Object.keys(propertyCosts);
+    const propertyIdsWithCosts = Object.keys(propertyCosts);
 
-    const properties = await Property.find({
-        _id: { $in: propertyIds }
-    });
+    const propertiesWithCosts = properties.filter(property =>
+        propertyIdsWithCosts.includes(property._id.toString())
+    );
 
-    const byProperty = properties.map(property => ({
+    const byProperty = propertiesWithCosts.map(property => ({
         propertyId: property._id.toString(),
         propertyName: property.name.toString(),
         actualCost: propertyCosts[property._id.toString()] ?? 0
@@ -86,16 +85,10 @@ export const getMaintenanceCostAnalytics =
         totalActualCost,
         totalLaborCost,
         totalMaterialCost,
-
-        costVariance:
-            totalEstimatedCost - totalActualCost,
-
+        costVariance: totalEstimatedCost - totalActualCost,
         averageActualCost,
-
         mostExpensiveRequest,
-
         byCategory: categoryCosts,
-
         byProperty
     };
 };

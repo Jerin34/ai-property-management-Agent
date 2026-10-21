@@ -1,10 +1,22 @@
 import Maintaince from "../models/maintenance.model.js";
+import Property from "../models/property.models.js";
+import { ROLES, type Role } from "../constants/roles.js";
 import { PropertyHealthService } from "./property-health.services.js";
 import { MaintenanceAlertType} from "../types/maintenance-alert.types.js";
 
-export const MaintenanceAlertService = async (): Promise<MaintenanceAlertType[]> => {
+export const MaintenanceAlertService = async (
+    userId: string,
+    role: Role
+): Promise<MaintenanceAlertType[]> => {
+    const properties = role === ROLES.Admin
+        ? await Property.find().select("_id")
+        : await Property.find({ manager: userId }).select("_id");
 
-    const maintenanceRequests = await Maintaince.find();
+    const propertyIds = properties.map(property => property._id);
+
+    const maintenanceRequests = role === ROLES.Admin
+        ? await Maintaince.find()
+        : await Maintaince.find({ property: { $in: propertyIds } });
 
     const alerts: MaintenanceAlertType[] = [];
 
