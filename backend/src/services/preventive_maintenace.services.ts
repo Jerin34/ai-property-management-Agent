@@ -41,40 +41,39 @@ export const processDueMaintenanceSchedule = async () => {
             
         });
         createMaintenances.push(maintenance);
-        const nextDueDate = new Date(schedule.nextDueDate);
-        switch(schedule.frequency){
-              case "DAILY":
-                nextDueDate.setDate(
-                    nextDueDate.getDate() + 1
-                );
-                break;
+       const nextDueDate = new Date(schedule.nextDueDate);
 
-            case "WEEKLY":
-                nextDueDate.setDate(
-                    nextDueDate.getDate() + 7
-                );
-                break;
+while (nextDueDate <= now) {
+    switch (schedule.frequency) {
+        case "DAILY":
+            nextDueDate.setDate(nextDueDate.getDate() + 1);
+            break;
 
-            case "MONTHLY":
-                nextDueDate.setMonth(
-                    nextDueDate.getMonth() + 1
-                );
-                break;
+        case "WEEKLY":
+            nextDueDate.setDate(nextDueDate.getDate() + 7);
+            break;
 
-            case "QUARTERLY":
-                nextDueDate.setMonth(
-                    nextDueDate.getMonth() + 3
-                );
-                break;
+        case "MONTHLY":
+            nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+            break;
 
-            case "YEARLY":
-                nextDueDate.setFullYear(
-                    nextDueDate.getFullYear() + 1
-                );
-                break;
-        }
-        schedule.nextDueDate = nextDueDate;
-        await schedule.save();
+        case "QUARTERLY":
+            nextDueDate.setMonth(nextDueDate.getMonth() + 3);
+            break;
+
+        case "YEARLY":
+            nextDueDate.setFullYear(nextDueDate.getFullYear() + 1);
+            break;
+
+        default:
+            throw new Error(
+                `Unsupported maintenance frequency: ${schedule.frequency}`
+            );
+    }
+}
+
+schedule.nextDueDate = nextDueDate;
+await schedule.save();
     }
     return createMaintenances;
 }

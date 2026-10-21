@@ -1,6 +1,7 @@
 import User from '../models/user.model.js';
 import type {UpdateUserRoleInput} from '../validator/user.validator.js'
 import  { ROLES } from '../constants/roles.js'
+import mongoose from "mongoose";
 export const updateUserRole = async(userId:string,data:UpdateUserRoleInput) =>{
     const user = await User.findByIdAndUpdate(
         userId,
@@ -45,3 +46,85 @@ export const updateTechnicianLocation = async(technicianId:string,latitude:numbe
     await technician.save();
     return technician;
 }
+export const getPendingRoleApprovals = async () => {
+    return User.find({
+        role: ROLES.Tenant,
+        subscriptionStatus: "ACTIVE",
+        roleApprovalStatus: "PENDING",
+    })
+        .select(
+            "name email subscriptionStatus roleApprovalStatus roleApprovalRequestedAt createdAt"
+        )
+        .sort({ roleApprovalRequestedAt: 1 });
+};
+export const approveManagerRole = async (
+    userId: string,
+    adminId: string
+) => {
+    if (
+        !mongoose.isValidObjectId(userId) ||
+        !mongoose.isValidObjectId(adminId)
+    ) {
+        throw new Error("Invalid user or admin ID");
+    }
+
+    const user = await User.findOneAndUpdate(
+        {
+            _id: userId,
+            role: ROLES.Tenant,
+            subscriptionStatus: "ACTIVE",
+            roleApprovalStatus: "PENDING",
+        },
+        {
+            $set: {
+                role: ROLES.Manager,
+                roleApprovalStatus: "APPROVED",
+                roleApprovedAt: new Date(),
+                roleApprovedBy: new mongoose.Types.ObjectId(adminId),
+            },
+        },
+        {
+            new: true,
+            runValidators: true,
+        }
+    ).select("-password");
+
+    if (!user) {
+        throw new Error(
+            "No eligible pending role approval found for this user"
+        );
+    }
+
+    return user;
+};
+export const rejectManagerRole = async (userId: string) => {
+    if (!mongoose.isValidObjectId(userId)) {
+        throw new Error("Invalid user ID");
+    }
+
+    const user = await User.findOneAndUpdate(
+        {
+            _id: userId,
+            role: ROLES.Tenant,
+            subscriptionStatus: "ACTIVE",
+            roleApprovalStatus: "PENDING",
+        },
+        {
+            $set: {
+                roleApprovalStatus: "REJECTED",
+            },
+        },
+        {
+            new: true,
+            runValidators: true,
+        }
+    ).select("-password");
+
+    if (!user) {
+        throw new Error(
+            "No eligible pending role approval found for this user"
+        );
+    }
+
+    return user;
+};

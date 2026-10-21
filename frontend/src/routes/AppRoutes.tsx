@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRoute.tsx";
 import RoleRoute from "./RoleRoute.tsx";
 
 import LoginPage from "../pages/LoginPage.tsx";
+import RegisterPage from "../pages/RegisterPage.tsx";
 import DashBoardPage from "../pages/DashboardPage.tsx";
 import PropertiesPage from "../pages/PropertiesPage.tsx";
 import Applayout from "../layouts/Applayout.tsx";
@@ -18,6 +19,9 @@ import MaintenanceCostAnalyticsPage from "../pages/MaintenanceCostAnalyticsPage.
 import MaintenanceSchedulerPage from "../pages/MaintenanceSchedulePage.tsx";
 import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePage.tsx";
 
+import AdminRoleApprovalsPage from '../pages/AdminRoleApprovalsPage.tsx'
+import ApplyForManagerPage from "../pages/ApplyForManagerRolePage.tsx";
+import WaitingForApprovalPage from "../pages/WaitingForApprovalPage.tsx"; 
 
 function AppRoutes() {
   return (
@@ -25,6 +29,7 @@ function AppRoutes() {
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* All authenticated users */}
         <Route element={<ProtectedRoute />}>
@@ -47,6 +52,11 @@ function AppRoutes() {
                 path="/maintenance/create"
                 element={<CreateMaintenancePage />}
               />
+              <Route path="/apply-for-manager" element={<ApplyForManagerPage />} />
+              <Route
+  path="/waiting-for-approval"
+  element={<WaitingForApprovalPage />}
+/>
             </Route>
 
             <Route
@@ -62,6 +72,12 @@ function AppRoutes() {
               />
             </Route>
 
+<Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+  <Route
+    path="/admin/role-approvals"
+    element={<AdminRoleApprovalsPage />}
+  />
+</Route>
             {/* Admin / Manager only */}
             <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
 

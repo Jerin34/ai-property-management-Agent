@@ -8,6 +8,13 @@ import { validate } from '../middleware/validator.middleware.js';
 import * as userController from '../controllers/user.controller.js';
 
 const router = Router();
+router.get(
+    "/role-approvals/pending",
+    authenticate,
+    autihorize(ROLES.Admin),
+    userController.getPendingApprovals
+);
+
 router.put('/:id/role',authenticate,autihorize(ROLES.Admin),validate(updateUserSchema),userController.updateRole)
 router.patch("/:id/skills",authenticate,autihorize(ROLES.Admin),validate(updateTechnicianSkillsSchema),userController.updateTechnicianSkills)
 router.patch(
@@ -16,4 +23,17 @@ router.patch(
     validate(updateLocationSchema),
     userController.updateTechnicianLocation
 );
+router.patch(
+    "/:id/role-approval/approve",
+    authenticate,
+    autihorize(ROLES.Admin),
+    userController.approveManagerRoleRequest
+);
+router.patch(
+    "/:id/role-approval/reject",
+    authenticate,
+    autihorize(ROLES.Admin),
+    userController.rejectManagerRoleRequest
+)
+
 export default router

@@ -2,15 +2,30 @@ import { Request,Response } from 'express';
 import { createMaintenanceSchedule ,getMaintenanceSchedule,getMaintenanceScheduleById ,getMaintenaceDueSchedules } from '../services/maintenance_scheduler.services.js';
 import { processDueMaintenanceSchedule } from '../services/preventive_maintenace.services.js'
 import  { createMaintenanceScheduleSchema } from '../validator/maintenance_scheduler.validator.js'
+import { ZodError } from 'zod';
 export const createSchedule = async(req:Request,res:Response):Promise<void> =>{
     try{
         const validateData = await createMaintenanceScheduleSchema.parse(req.body);
         const schedule = await createMaintenanceSchedule(validateData);
         res.status(201).json({success:true,data:schedule});
     }
-    catch(err){
-        res.status(500).json({success:false,message:"Internal Server Error"});
+  catch (err) {
+    if (err instanceof ZodError) {
+        res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors: err.issues
+        });
+        return;
     }
+
+    console.error("Error creating maintenance schedule:", err);
+
+    res.status(500).json({
+        success: false,
+        message: "Internal Server Error"
+    });
+}
 }
 export const getSchedule = async(req:Request,res:Response):Promise<void> =>{
     try{

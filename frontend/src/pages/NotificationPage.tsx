@@ -1,164 +1,221 @@
-    import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    getNotifications,
-    markNotificationsAsRead
+  getNotifications,
+  markNotificationsAsRead,
 } from "../api/notification.api";
 import type { Notification } from "../types/notification.types";
 import NotificationPreferences from "../components/NotificationPreferences";
+
 const NotificationPage = () => {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        let isMounted = true;
+  useEffect(() => {
+    let isMounted = true;
 
-        const loadNotifications = async () => {
-            try {
-                const data = await getNotifications();
+    const loadNotifications = async () => {
+      try {
+        const data = await getNotifications();
 
-                if (isMounted) {
-                    setNotifications(data);
-                    setError(null);
-                }
-            } catch (error) {
-                console.error("Error loading notifications:", error);
-
-                if (isMounted) {
-                    setError("Error loading notifications");
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        loadNotifications();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
-    const handleMarkAsRead = async (notificationId: string) => {
-        try {
-            await markNotificationsAsRead([notificationId]);
-
-            setNotifications((prev) =>
-                prev.map((notification) =>
-                    notification._id === notificationId
-                        ? {
-                              ...notification,
-                              isRead: true
-                          }
-                        : notification
-                )
-            );
-        } catch (error) {
-            console.error(
-                "Error marking notification as read:",
-                error
-            );
+        if (isMounted) {
+          setNotifications(data);
+          setError(null);
         }
+      } catch (error) {
+        console.error("Error loading notifications:", error);
+
+        if (isMounted) {
+          setError("Error loading notifications");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     };
 
-    const handleMarkAllAsRead = async () => {
-        const unreadIds = notifications
-            .filter((notification) => !notification.isRead)
-            .map((notification) => notification._id);
+    loadNotifications();
 
-        if (unreadIds.length === 0) {
-            return;
-        }
-
-        try {
-            await markNotificationsAsRead(unreadIds);
-
-            setNotifications((prev) =>
-                prev.map((notification) => ({
-                    ...notification,
-                    isRead: true
-                }))
-            );
-        } catch (error) {
-            console.error(
-                "Error marking all notifications as read:",
-                error
-            );
-
-            setError("Error marking all notifications as read");
-        }
+    return () => {
+      isMounted = false;
     };
+  }, []);
 
-    const unreadCount = notifications.filter(
-        (notification) => !notification.isRead
-    ).length;
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      await markNotificationsAsRead([notificationId]);
 
-    if (loading) {
-        return <p>Loading notifications...</p>;
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification._id === notificationId
+            ? {
+                ...notification,
+                isRead: true,
+              }
+            : notification
+        )
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    const unreadIds = notifications
+      .filter((notification) => !notification.isRead)
+      .map((notification) => notification._id);
+
+    if (unreadIds.length === 0) {
+      return;
     }
 
-    if (error) {
-        return <p>{error}</p>;
-    }
+    try {
+      await markNotificationsAsRead(unreadIds);
 
+      setNotifications((prev) =>
+        prev.map((notification) => ({
+          ...notification,
+          isRead: true,
+        }))
+      );
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      setError("Error marking all notifications as read");
+    }
+  };
+
+  const unreadCount = notifications.filter(
+    (notification) => !notification.isRead
+  ).length;
+
+  if (loading) {
     return (
-        <div>
-            <div>
-                <h1>Notifications</h1>
-
-                <p>
-                    {unreadCount} unread notification
-                    {unreadCount !== 1 ? "s" : ""}
-                </p>
-
-                {unreadCount > 0 && (
-                    <button onClick={handleMarkAllAsRead}>
-                        Mark all as read
-                    </button>
-                )}
-            </div>
-
-            {notifications.length === 0 ? (
-                <p>No notifications yet.</p>
-            ) : (
-                <div>
-                    {notifications.map((notification) => (
-                        <div key={notification._id}>
-                            <h3>{notification.title}</h3>
-
-                            <p>{notification.message}</p>
-
-                            <p>
-                                <strong>Severity:</strong>{" "}
-                                {notification.severity}
-                            </p>
-
-                            <p>
-                                {new Date(
-                                    notification.createdAt
-                                ).toLocaleDateString()}
-                            </p>
-
-                            {!notification.isRead && (
-                                <button
-                                    onClick={() =>
-                                        handleMarkAsRead(
-                                            notification._id
-                                        )
-                                    }
-                                >
-                                    Mark as read
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}
-            <NotificationPreferences />
-        </div>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading notification center...</p>
+      </div>
     );
+  }
+
+  if (error) {
+    return <div className="alert-error">{error}</div>;
+  }
+
+  const getSeverityBadgeClass = (severity: string) => {
+    switch (severity?.toUpperCase()) {
+      case "CRITICAL":
+      case "HIGH":
+        return "badge-emergency";
+      case "WARNING":
+      case "MEDIUM":
+        return "badge-high";
+      default:
+        return "badge-open";
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="page-header-left">
+          <h1 className="page-header-title">Notification Center</h1>
+          <p className="page-header-subtitle">
+            System alerts, AI incident escalation notices, and dispatch updates.
+          </p>
+        </div>
+        <div className="page-header-actions">
+          <span
+            className={`badge ${unreadCount > 0 ? "badge-high" : "badge-neutral"}`}
+            style={{ padding: "0.45rem 0.85rem", fontSize: "0.85rem" }}
+          >
+            {unreadCount} Unread Alert{unreadCount !== 1 ? "s" : ""}
+          </span>
+          {unreadCount > 0 && (
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={handleMarkAllAsRead}
+            >
+              ✓ Mark all as read
+            </button>
+          )}
+        </div>
+      </div>
+
+      {notifications.length === 0 ? (
+        <div className="empty-state">
+          <span className="empty-state-icon">🔔</span>
+          <h3>No Notifications Yet</h3>
+          <p>You have caught up with all maintenance events and system notices.</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+          {notifications.map((notification) => (
+            <div
+              key={notification._id}
+              className="card"
+              style={{
+                borderLeft: !notification.isRead
+                  ? "4px solid var(--primary)"
+                  : "4px solid var(--border)",
+                background: !notification.isRead ? "#ffffff" : "var(--bg-card-subtle)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
+                  marginBottom: "0.35rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                  <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 600 }}>
+                    {notification.title}
+                  </h3>
+                  {!notification.isRead && (
+                    <span className="badge badge-open" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem" }}>
+                      New
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span className={`badge ${getSeverityBadgeClass(notification.severity)}`}>
+                    {notification.severity}
+                  </span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                    {new Date(notification.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ color: "var(--text-body)", fontSize: "0.9rem", margin: "0.25rem 0 0.85rem 0" }}>
+                {notification.message}
+              </p>
+
+              {!notification.isRead && (
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => handleMarkAsRead(notification._id)}
+                  >
+                    Mark as read
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Embedded Alert Preferences */}
+      <NotificationPreferences />
+    </div>
+  );
 };
 
 export default NotificationPage;

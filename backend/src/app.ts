@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 
+
 import authRoutes from './routes/auth.routes.js'
 import userRoutes from './routes/user.routes.js'
 import propertyRoutes from './routes/property.routes.js'
@@ -22,6 +23,8 @@ import maintenanceAnalyticsRoutes from './routes/maintenance-analytics.routes.js
 import notificationsRoutes from './routes/notification.routes.js'
 import notificationPreferencesRoutes from './routes/notification_preferences.routes.js'
 
+import subscriptionRoutes from './routes/subscription.routes.js'
+import subscriptionWebhookRoutes from  './routes/subscription-webhook.routes.js'
 
 const app = express()
 
@@ -29,6 +32,11 @@ const app = express()
 // ==================================================
 // GLOBAL MIDDLEWARE
 // ==================================================
+app.use(
+    "/api/subscriptions/webhook",
+    express.raw({type: "application/json"}),
+    subscriptionWebhookRoutes
+)
 
 app.use(cors())
 app.use(helmet())
@@ -171,5 +179,6 @@ app.use(
     notificationsRoutes
 )
 
+app.use('/api/subscriptions', subscriptionRoutes)
 
 export default app

@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 export const createMaintenanceScheduleSchema = z.object({
-    property: z.string().min(1),
-
-    title: z.string().min(1),
+    property: z.string().regex(/^[0-9a-fA-F]{24}$/, {
+    message: "Invalid property ID"
+}),
+   title: z.string().trim().min(1, {
+    message: "Title is required"
+}),
 
     description: z.string().optional(),
 

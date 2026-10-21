@@ -1,13 +1,15 @@
-interface KpiCardsProps{
-    title:string;
-    value:number;
+interface KpiCardsProps {
+  title: string;
+  value: number;
 }
-function KpiCard({title,value}:KpiCardsProps){
-    return(
-        <div className="kpi-card">
-            <p className="kpi-card-value">{value}</p>
-            <h2 className="kpi-card-title" >{title}</h2>
-        </div>
-    )
+
+function KpiCard({ title, value }: KpiCardsProps) {
+  return (
+    <div className="kpi-card">
+      <h3 className="kpi-card-title">{title}</h3>
+      <div className="kpi-card-value">{value}</div>
+    </div>
+  );
 }
-export default KpiCard
+
+export default KpiCard;

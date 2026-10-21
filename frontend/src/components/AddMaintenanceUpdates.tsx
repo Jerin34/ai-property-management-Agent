@@ -1,49 +1,65 @@
-import {useState} from 'react'
-interface AddMaintenanceUpateProps{
-    maintenanceId:string;
-    onUpdateCreated:() =>void;
-}
-import { createMaintenanceUpdate } from '../api/maintenance.api';
-function AddMaintenanceUpdate({
-    maintenanceId,
-    onUpdateCreated,}
-    :AddMaintenanceUpateProps
-){
-    const [message,setMessage] = useState("");
-    const [isLoading,setiSLoading] = useState(false);
-    const [error,setError] = useState<string | null>(null);
-    const handleSubmit = async() =>{
-        if(!message.trim()){
-            setError("Update Message Cannot Be Empty")
-        }
-        try{
-            setiSLoading(true);
-            setError(null);
-            await createMaintenanceUpdate(maintenanceId,
-                {
-                    message:message.trim(),
-                });
-                setMessage('');
-                onUpdateCreated();
-        }
-        catch(err){
-            console.log("Error in creating Maintenance Updates",err)
-            setError("Failed to create maintenance update")
-        }
-        finally{
-            setiSLoading(false);
-    }
-}
-    return(
-        <div>
-            <h1>Add Update</h1>
-            <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder='Enter Your Maintenance Update here' />
-                <button onClick={handleSubmit} disabled={isLoading}>
-                    {isLoading ? "Adding Update..." : "Add Update"}
-                </button>
-                {error && <p>{error}</p>}
-        </div>
-    );
+import { useState } from "react";
+import { createMaintenanceUpdate } from "../api/maintenance.api";
 
+interface AddMaintenanceUpateProps {
+  maintenanceId: string;
+  onUpdateCreated: () => void;
 }
-export default AddMaintenanceUpdate
+
+function AddMaintenanceUpdate({
+  maintenanceId,
+  onUpdateCreated,
+}: AddMaintenanceUpateProps) {
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!message.trim()) {
+      setError("Update Message Cannot Be Empty");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      setError(null);
+      await createMaintenanceUpdate(maintenanceId, {
+        message: message.trim(),
+      });
+      setMessage("");
+      onUpdateCreated();
+    } catch (err) {
+      console.log("Error in creating Maintenance Updates", err);
+      setError("Failed to create maintenance update");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="card" style={{ marginBottom: "1.5rem" }}>
+      <h3 className="card-title">Add Work Update</h3>
+      {error && <div className="alert-error">{error}</div>}
+      <div className="form-group">
+        <textarea
+          rows={3}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Enter maintenance update or repair progress details..."
+          disabled={isLoading}
+        />
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSubmit}
+          disabled={isLoading}
+        >
+          {isLoading ? "Adding Update..." : "Post Update"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default AddMaintenanceUpdate;

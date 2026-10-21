@@ -12,6 +12,8 @@ if(RAZORPAY_KEY_ID === undefined) throw new Error('RAZORPAY_KEY_ID is not define
 if(RAZORPAY_KEY_SECRET === undefined) throw new Error('RAZORPAY_KEY_SECRET is not defined')
     const RAZORPAY_PLAN_ID = process.env.RAZORPAY_PLAN_ID
 if(RAZORPAY_PLAN_ID === undefined) throw new Error('RAZORPAY_PLAN_ID is not defined')
+    const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET
+if(RAZORPAY_WEBHOOK_SECRET === undefined) throw new Error('RAZORPAY_WEBHOOK_SECRET is not defined')
     const env = {
         PORT,
         MONGODB_URI,
@@ -19,6 +21,7 @@ if(RAZORPAY_PLAN_ID === undefined) throw new Error('RAZORPAY_PLAN_ID is not defi
         GEMINI_API_KEY,
         RAZORPAY_KEY_ID,
         RAZORPAY_KEY_SECRET,
-        RAZORPAY_PLAN_ID
+        RAZORPAY_PLAN_ID,
+        RAZORPAY_WEBHOOK_SECRET
     }
     export default env

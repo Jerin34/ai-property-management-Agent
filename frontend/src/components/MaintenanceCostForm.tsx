@@ -55,39 +55,49 @@ function MaintenanceCostForm({
   };
 
   return (
-    <div>
-      <h2>Update Repair Cost</h2>
+    <div className="card" style={{ marginBottom: "1.5rem" }}>
+      <h3 className="card-title">Update Actual Repair Costs</h3>
+
+      {isError && <div className="alert-error">{isError}</div>}
 
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="laborCost">Labor Cost</label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", marginBottom: "1rem" }}>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label className="form-label" htmlFor="laborCost">
+              Labor Cost ($)
+            </label>
+            <input
+              id="laborCost"
+              type="number"
+              min="0"
+              placeholder="0.00"
+              value={laborCost}
+              onChange={(e) => setLaborCost(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </div>
 
-          <input
-            id="laborCost"
-            type="number"
-            min="0"
-            value={laborCost}
-            onChange={(e) => setLaborCost(e.target.value)}
-          />
+          <div className="form-group" style={{ margin: 0 }}>
+            <label className="form-label" htmlFor="materialCost">
+              Material Cost ($)
+            </label>
+            <input
+              id="materialCost"
+              type="number"
+              min="0"
+              placeholder="0.00"
+              value={materialCost}
+              onChange={(e) => setMaterialCost(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="materialCost">Material Cost</label>
-
-          <input
-            id="materialCost"
-            type="number"
-            min="0"
-            value={materialCost}
-            onChange={(e) => setMaterialCost(e.target.value)}
-          />
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? "Updating..." : "Save Actual Costs"}
+          </button>
         </div>
-
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Updating..." : "Update Cost"}
-        </button>
-
-        {isError && <p style={{ color: "red" }}>{isError}</p>}
       </form>
     </div>
   );
