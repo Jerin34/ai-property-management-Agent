@@ -187,6 +187,17 @@ export const getPropertyHealth = async(req:Request,res:Response):Promise<void> =
             });
             return ;
         }
+        const property = await getPropertyByIdService(propertyId);
+        if (
+            req.user.role !== ROLES.Admin &&
+            property.manager.toString() !== req.user.userId
+        ) {
+            res.status(403).json({
+                success: false,
+                message: "You are not allowed to view this property's health"
+            });
+            return;
+        }
         const health = await PropertyHealthService(propertyId);
         res.status(200).json({success:true,data:health});
     }
@@ -199,7 +210,23 @@ export const getPropertyHealth = async(req:Request,res:Response):Promise<void> =
 }
 export const ManagerCopilot = async(req:Request,res:Response):Promise<void> =>{
     try{
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
         const propertyId = req.params.id.toString();
+        const property = await getPropertyByIdService(propertyId);
+        if (
+            user.role !== ROLES.Admin &&
+            property.manager.toString() !== user.userId
+        ) {
+            res.status(403).json({
+                success: false,
+                message: "You are not allowed to view this property's copilot"
+            });
+            return;
+        }
         const analysis = await ManagerCopilotService(propertyId);
         res.status(200).json({success:true,data:analysis});
     }catch(err){
