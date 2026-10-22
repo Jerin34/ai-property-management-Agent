@@ -1,12 +1,35 @@
+
 import Maintaince from "../models/maintenance.model.js";
 import Property from "../models/property.models.js";
 import { MaintenanceCostAnalytics } from "../types/maintenance_cost_analytics.types.js";
 
+export const getMaintenanceCostAnalytics = async (
+    userId: string,
+    role: string
+): Promise<MaintenanceCostAnalytics> => {
 
-export const getMaintenanceCostAnalytics =
-    async (): Promise<MaintenanceCostAnalytics> => {
+    // Allow only administrators and managers
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        throw new Error("Unauthorized role for cost analytics");
+    }
 
-    const maintenanceRequests = await Maintaince.find();
+    // 1. Fetch all properties for ADMIN, or only owned properties for MANAGER
+    const properties =
+        role === "ADMIN"
+            ? await Property.find()
+            : await Property.find({ manager: userId });
+
+    const managedPropertyIds = properties.map(
+        (property) => property._id
+    );
+
+    // 2. Fetch maintenance requests within the user's authorized scope
+    const maintenanceRequests =
+        role === "ADMIN"
+            ? await Maintaince.find()
+            : await Maintaince.find({
+                property: { $in: managedPropertyIds }
+            });
 
     let totalEstimatedCost = 0;
     let totalActualCost = 0;
@@ -15,10 +38,11 @@ export const getMaintenanceCostAnalytics =
 
     const categoryCosts: Record<string, number> = {};
 
-    let mostExpensiveRequest: MaintenanceCostAnalytics["mostExpensiveRequest"] = null;
+    let mostExpensiveRequest:
+        MaintenanceCostAnalytics["mostExpensiveRequest"] = null;
 
+    // 3. Calculate total costs, category costs, and the most expensive request
     for (const request of maintenanceRequests) {
-
         const estimatedCost = request.estimatedCost ?? 0;
         const actualCost = request.actualCost ?? 0;
         const laborCost = request.laborCost ?? 0;
@@ -29,15 +53,13 @@ export const getMaintenanceCostAnalytics =
         totalLaborCost += laborCost;
         totalMaterialCost += materialCost;
 
-        // Category cost
         categoryCosts[request.category] =
             (categoryCosts[request.category] ?? 0) + actualCost;
 
-        // Most expensive request
         if (
             actualCost > 0 &&
             (!mostExpensiveRequest ||
-            actualCost > mostExpensiveRequest.actualCost)
+                actualCost > mostExpensiveRequest.actualCost)
         ) {
             mostExpensiveRequest = {
                 maintenanceId: request._id.toString(),
@@ -47,21 +69,20 @@ export const getMaintenanceCostAnalytics =
         }
     }
 
-    const requestsWithActualCost =
-        maintenanceRequests.filter(
-            request => (request.actualCost ?? 0) > 0
-        ).length;
+    // 4. Calculate average actual cost per request that has an actual cost
+    const requestsWithActualCost = maintenanceRequests.filter(
+        (request) => (request.actualCost ?? 0) > 0
+    ).length;
 
     const averageActualCost =
         requestsWithActualCost > 0
             ? totalActualCost / requestsWithActualCost
             : 0;
 
-    // Property cost calculation
+    // 5. Calculate actual cost per property
     const propertyCosts: Record<string, number> = {};
 
     for (const request of maintenanceRequests) {
-
         const propertyId = request.property.toString();
         const actualCost = request.actualCost ?? 0;
 
@@ -69,33 +90,31 @@ export const getMaintenanceCostAnalytics =
             (propertyCosts[propertyId] ?? 0) + actualCost;
     }
 
-    const propertyIds = Object.keys(propertyCosts);
+    // Reuse the already-authorized properties; do not fetch other managers' properties
+    const byProperty = properties
+        .filter((property) =>
+            Object.prototype.hasOwnProperty.call(
+                propertyCosts,
+                property._id.toString()
+            )
+        )
+        .map((property) => ({
+            propertyId: property._id.toString(),
+            propertyName: property.name.toString(),
+            actualCost: propertyCosts[property._id.toString()] ?? 0
+        }));
 
-    const properties = await Property.find({
-        _id: { $in: propertyIds }
-    });
-
-    const byProperty = properties.map(property => ({
-        propertyId: property._id.toString(),
-        propertyName: property.name.toString(),
-        actualCost: propertyCosts[property._id.toString()] ?? 0
-    }));
-
+    // 6. Return analytics for the authorized scope only
     return {
         totalEstimatedCost,
         totalActualCost,
         totalLaborCost,
         totalMaterialCost,
-
-        costVariance:
-            totalEstimatedCost - totalActualCost,
-
+        costVariance: totalEstimatedCost - totalActualCost,
         averageActualCost,
-
         mostExpensiveRequest,
-
         byCategory: categoryCosts,
-
         byProperty
     };
 };
+    

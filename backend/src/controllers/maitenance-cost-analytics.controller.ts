@@ -7,8 +7,14 @@ export const maintenanceCostAnalytics = async (
 ): Promise<void> => {
 
     try {
-
-        const analytics = await getMaintenanceCostAnalytics();
+        const user  = req.user;
+        if(!user){
+            res.status(401).json({success:false,message:"UnAunthorized Access"})
+            return ;
+        }
+        const analytics = await getMaintenanceCostAnalytics(
+            user.userId,user.role
+        );
 
         res.status(200).json({
             success: true,
