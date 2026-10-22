@@ -21,7 +21,7 @@ import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePag
 
 import AdminRoleApprovalsPage from '../pages/AdminRoleApprovalsPage.tsx'
 import ApplyForManagerPage from "../pages/ApplyForManagerRolePage.tsx";
-import WaitingForApprovalPage from "../pages/WaitingForApprovalPage.tsx"; 
+
 
 function AppRoutes() {
   return (
@@ -53,10 +53,6 @@ function AppRoutes() {
                 element={<CreateMaintenancePage />}
               />
               <Route path="/apply-for-manager" element={<ApplyForManagerPage />} />
-              <Route
-  path="/waiting-for-approval"
-  element={<WaitingForApprovalPage />}
-/>
             </Route>
 
             <Route

@@ -10,7 +10,7 @@ import {
 
 
 export const getMaintenanceAnalytics =
-    async (): Promise<MaintenanceAnalytics> => {
+    async (userId:string, role:string): Promise<MaintenanceAnalytics> => {
 
     const maintenaceRequests =
         await Maintaince.find();
@@ -186,7 +186,7 @@ export const getMaintenanceAnalytics =
     // --------------------------------------------------
 
     const properties =
-        await Property.find();
+        role === "ADMIN" ? await Property.find():await Property.find({manager:userId})
 
     const propertyIssues =
         properties
