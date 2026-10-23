@@ -1,16 +1,24 @@
-import cron from 'node-cron';
-import { processDueMaintenanceSchedule } from '../services/preventive_maintenace.services.js';
-export const startPreventiveMaintenanceJob = async() =>{
-    cron.schedule('0 0 * * *', async () => {
-        try{
-            console.log('Running preventive maintenance job')
-            const maintenaces = await processDueMaintenanceSchedule()
-            console.log(`Preventive Maintenaces processed ${maintenaces.length}`);
 
+import cron from "node-cron";
+import {
+    processDueMaintenanceScheduleSystem
+} from "../services/preventive_maintenace.services.js";
+
+export const startPreventiveMaintenanceJob = () => {
+    cron.schedule("0 0 * * *", async () => {
+        try {
+            console.log("Running preventive maintenance job");
+            console.log("Preventive maintenance cron job scheduled");
+            const maintenances =
+                await processDueMaintenanceScheduleSystem();
+
+            console.log(
+                `Preventive maintenances processed: ${maintenances.length}`
+            );
+        } catch (error) {
+            console.error("Preventive maintenance job error:", error);
         }
-        catch(err){
-            console.log('Preventive Maintenace JOB Error',err);
-        }
-        console.log('Preventive Maintenace JOB Running')
-    })
-}
+    });
+
+    console.log("Preventive maintenance cron job scheduled");
+};
