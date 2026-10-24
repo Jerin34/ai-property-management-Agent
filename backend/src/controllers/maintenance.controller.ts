@@ -23,17 +23,46 @@ export const createMaintenance = async(req:Request,res:Response) :Promise<void> 
             data: maintenance,
      })
     }catch(err){
-        if(err instanceof Error && err.message === 'Property not found'){
-             res.status(404).json({
+       console.error("Create maintenance request failed:", err);
+
+        const apiError = err as {
+            status?: number;
+            message?: string;
+        };
+
+        if (err instanceof Error && err.message === "Property not found") {
+            res.status(404).json({
                 success: false,
                 message: "Property not found",
             });
             return;
         }
+
+        const errorMessage = apiError.message ?? (
+            err instanceof Error ? err.message : ""
+        );
+
+        const isGeminiUnavailable =
+            apiError.status === 429 ||
+            apiError.status === 503 ||
+            errorMessage.includes("RESOURCE_EXHAUSTED") ||
+            errorMessage.toLowerCase().includes("quota") ||
+            errorMessage.toLowerCase().includes("high demand");
+
+        if (isGeminiUnavailable) {
+            res.status(503).json({
+                success: false,
+                code: "AI_SERVICE_BUSY",
+                message: "AI is currently busy. Please create your maintenance request later.",
+            });
+            return;
+        }
+
         res.status(500).json({
-            success:false,
-            message:'Internal Server Error'
+            success: false,
+            message: "Failed to create maintenance request. Please try again later.",
         });
+
     };
 
 };

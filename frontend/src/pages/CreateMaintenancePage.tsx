@@ -1,41 +1,94 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createMaintenanceRequest } from "../api/maintenance.api";
+import {
+  getAvailableProperties,
+  type AvailableProperty,
+} from "../api/property.api";
 
 function CreateMaintenancePage() {
   const navigate = useNavigate();
+
   const [propertyId, setPropertyId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [properties, setProperties] = useState<AvailableProperty[]>([]);
+  const [isLoadingProperties, setIsLoadingProperties] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        setError(null);
+        const availableProperties = await getAvailableProperties();
+        setProperties(availableProperties);
+      } catch (error) {
+        console.error("Failed to load properties:", error);
+        setError("Unable to load properties. Please refresh and try again.");
+      } finally {
+        setIsLoadingProperties(false);
+      }
+    };
+
+    void loadProperties();
+  }, []);
+
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
     setError(null);
-    if (!propertyId.trim()) {
-      setError("Property ID is required.");
+
+    if (!propertyId) {
+      setError("Please select a property.");
       return;
     }
+
     if (title.trim().length < 3) {
       setError("Maintenance title must be at least 3 characters long.");
       return;
     }
+
     if (description.trim().length < 10) {
       setError("Maintenance description must be at least 10 characters long.");
       return;
     }
+
     try {
       setIsSubmitting(true);
+
       const maintenance = await createMaintenanceRequest({
-        propertyId: propertyId.trim(),
+        propertyId,
         title: title.trim(),
         description: description.trim(),
       });
+
       navigate(`/maintenance/${maintenance._id}`, { replace: true });
     } catch (error) {
-      console.log("Failed to create maintenance request", error);
-      setError("Failed to create maintenance request. Please try again later.");
+     console.error("Failed to create maintenance request:", error);
+
+  const apiError = error as {
+    response?: {
+      data?: {
+        code?: string;
+        message?: string;
+      };
+    };
+  };
+
+  if (apiError.response?.data?.code === "AI_SERVICE_BUSY") {
+    window.alert(
+      "AI is currently busy. Please create your maintenance request later."
+    );
+    return;
+  }
+
+  setError(
+    apiError.response?.data?.message ??
+      "Failed to create maintenance request. Please try again later."
+  );
     } finally {
       setIsSubmitting(false);
     }
@@ -45,9 +98,12 @@ function CreateMaintenancePage() {
     <div style={{ maxWidth: "720px", margin: "0 auto" }}>
       <div className="page-header">
         <div className="page-header-left">
-          <h1 className="page-header-title">Create Maintenance Request</h1>
+          <h1 className="page-header-title">
+            Create Maintenance Request
+          </h1>
           <p className="page-header-subtitle">
-            Submit a repair issue. Our AI triage system will automatically classify priority and summarize the issue.
+            Select your property and describe the issue. Our AI triage
+            system will automatically classify its priority and summarize it.
           </p>
         </div>
       </div>
@@ -58,22 +114,48 @@ function CreateMaintenancePage() {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label" htmlFor="propertyId">
-              Property ID <span style={{ color: "var(--status-emergency-text)" }}>*</span>
+              Select Property{" "}
+              <span style={{ color: "var(--status-emergency-text)" }}>*</span>
             </label>
-            <input
+
+            <select
               id="propertyId"
-              type="text"
               value={propertyId}
               onChange={(event) => setPropertyId(event.target.value)}
-              placeholder="e.g. 64b8f0..."
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting ||
+                isLoadingProperties ||
+                properties.length === 0
+              }
               required
-            />
+            >
+              <option value="">
+                {isLoadingProperties
+                  ? "Loading properties..."
+                  : properties.length === 0
+                    ? "No properties available"
+                    : "Choose your property"}
+              </option>
+
+              {properties.map((property) => (
+                <option key={property._id} value={property._id}>
+                  {property.name} — {property.address.street},{" "}
+                  {property.address.city}
+                </option>
+              ))}
+            </select>
+
+            {!isLoadingProperties && properties.length === 0 && (
+              <p className="page-header-subtitle">
+                No properties were found. Please contact your property manager.
+              </p>
+            )}
           </div>
 
           <div className="form-group">
             <label className="form-label" htmlFor="title">
-              Request Title <span style={{ color: "var(--status-emergency-text)" }}>*</span>
+              Request Title{" "}
+              <span style={{ color: "var(--status-emergency-text)" }}>*</span>
             </label>
             <input
               id="title"
@@ -82,26 +164,38 @@ function CreateMaintenancePage() {
               onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. AC cooling unit leaking water"
               disabled={isSubmitting}
+              minLength={3}
+              maxLength={100}
               required
             />
           </div>
 
           <div className="form-group">
             <label className="form-label" htmlFor="description">
-              Issue Description <span style={{ color: "var(--status-emergency-text)" }}>*</span>
+              Issue Description{" "}
+              <span style={{ color: "var(--status-emergency-text)" }}>*</span>
             </label>
             <textarea
               id="description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="Describe what happened, location inside property, severity, and any sounds or odors..."
+              placeholder="Describe what happened, where it occurred, and how severe it is..."
               rows={5}
+              minLength={10}
+              maxLength={1000}
               disabled={isSubmitting}
               required
             />
           </div>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1.5rem" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "0.75rem",
+              marginTop: "1.5rem",
+            }}
+          >
             <button
               type="button"
               className="btn btn-secondary"
@@ -110,13 +204,21 @@ function CreateMaintenancePage() {
             >
               Cancel
             </button>
+
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting ||
+                isLoadingProperties ||
+                properties.length === 0
+              }
             >
-              {isSubmitting ? "Submitting Request..." : "Submit Maintenance Ticket"}
+              {isSubmitting
+                ? "Submitting Request..."
+                : "Submit Maintenance Ticket"}
             </button>
+            
           </div>
         </form>
       </div>

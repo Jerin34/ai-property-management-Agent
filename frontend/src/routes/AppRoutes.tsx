@@ -18,6 +18,7 @@ import MaintenanceSLAPage from "../pages/MaintenanceSLAPage.tsx";
 import MaintenanceCostAnalyticsPage from "../pages/MaintenanceCostAnalyticsPage.tsx";
 import MaintenanceSchedulerPage from "../pages/MaintenanceSchedulePage.tsx";
 import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePage.tsx";
+import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
 
 import AdminRoleApprovalsPage from '../pages/AdminRoleApprovalsPage.tsx'
 import ApplyForManagerPage from "../pages/ApplyForManagerRolePage.tsx";
@@ -42,6 +43,9 @@ function AppRoutes() {
                 path="/maintenance/cost-analytics"
                 element={<MaintenanceCostAnalyticsPage />}
               />
+            </Route>
+            <Route element={<RoleRoute allowedRoles={["MANAGER"]} />}>
+            <Route path="/properties/create" element={<CreatePropertyPage/>} />
             </Route>
 
             {/* Maintenance is accessible to authenticated roles */}

@@ -11,6 +11,11 @@ export const getMyProperties = async(managerId:string) =>{
     })
     return properties
 }
+export const getAvailableProperties = async () => {
+    return await Property.find({ isActive: true })
+        .select("_id name address")
+        .sort({ name: 1 });
+};
 export const getPropertyByid = async(propertyId:string)=>{
     const property = await Property.findById(propertyId);
     if(!property){

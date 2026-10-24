@@ -109,16 +109,24 @@ function PropertyDetailsPage() {
             {property.address.street}, {property.address.city}, {property.address.state} {property.address.postalcode}
           </p>
         </div>
-        <div className="page-header-actions">
-          <a
-            href={`https://www.google.com/maps?q=${property.location.latitude},${property.location.longitude}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-secondary"
-          >
-            🗺️ View on Google Maps
-          </a>
-        </div>
+       <div className="page-header-actions">
+  {property.location &&
+  property.location.latitude != null &&
+  property.location.longitude != null ? (
+    <a
+      href={`https://www.google.com/maps?q=${property.location.latitude},${property.location.longitude}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn btn-secondary"
+    >
+      🗺️ View on Google Maps
+    </a>
+  ) : (
+    <span className="meta-label">
+      Map coordinates not available
+    </span>
+  )}
+</div>
       </div>
 
       {/* Main Info Cards Grid */}

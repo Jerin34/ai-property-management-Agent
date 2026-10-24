@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getProperties } from "../api/property.api";
 import PropertyCard from "../components/PropertyCard";
 import type { Property } from "../types/property.types";
@@ -7,7 +8,7 @@ function PropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -51,6 +52,9 @@ function PropertiesPage() {
           <span className="badge badge-neutral" style={{ fontSize: "0.85rem", padding: "0.4rem 0.85rem" }}>
             Total Properties: {properties.length}
           </span>
+          <button    type="button"
+  className="btn btn-primary"
+  onClick={() => navigate("/properties/create")}>Create Property</button>
         </div>
       </div>
 

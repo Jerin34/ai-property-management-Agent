@@ -1,10 +1,10 @@
 import type {Request,Response} from 'express';
-import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService} from '../services/property.service.js';
+import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService,getAvailableProperties} from '../services/property.service.js';
 import { PropertyHealthService } from '../services/property-health.services.js'
 import {ROLES} from '../constants/roles.js'
 import { ManagerCopilotService } from '../services/manager-copilot.services.js';
 export const create  =  async(req:Request,res:Response): Promise<void>=>{
-    try{
+    try{ 
         if(!req.user){
              res.status(401).json({
                 success:false,
@@ -93,6 +93,27 @@ export const getPropertyById = async(req:Request,res:Response):Promise<void> =>{
         })
     }
 }
+export const getAvailablePropertiesList = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const properties = await getAvailableProperties();
+
+        res.status(200).json({
+            success: true,
+            message: "Available properties fetched successfully",
+            data: properties
+        });
+    } catch (error) {
+        console.error("Failed to fetch available properties:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch available properties"
+        });
+    }
+};
 export const updateProperty =async (req:Request,res:Response):Promise<void> =>{
     try{
         const user  =req.user;

@@ -7,14 +7,20 @@ import {createPropertySchema,updatePropertySchema} from  '../validator/property.
 import * as propertyController from '../controllers/property.controller.js'
 const router = Router()
 router.post("/",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(createPropertySchema),propertyController.create)
-router.patch("/:id/deactivate",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.deactivateProperty)
+router.get(
+    "/available",
+    authenticate,
+    autihorize(ROLES.Tenant),
+    propertyController.getAvailablePropertiesList
+);
 router.get("/my",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.getProperties)
+router.patch("/:id/deactivate",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.deactivateProperty)
 router.get(
     "/:id",
     authenticate,
     autihorize(ROLES.Admin, ROLES.Manager),
     propertyController.getPropertyById
-);
+);   
 router.get(
     "/:id/copilot",
     authenticate,
