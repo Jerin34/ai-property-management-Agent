@@ -3,13 +3,21 @@ import authenticate from "../middleware/auth.middileware.js";
 import { autihorize } from "../middleware/role.middleware.js";
 import {ROLES}  from '../constants/roles.js'
 import {validate} from '../middleware/validator.middleware.js' 
+import upload from '../middleware/upload.middleware.js'
 import { createMaintenanceSchema,AssignTechnicianSchema ,UpdatesTechnicianStatusSchema } from "../validator/maintenance.validator.js";
 import * as maintainanceController from '../controllers/maintenance.controller.js'
 const router = Router()
+router.post(
+  "/",
+  authenticate,
+  autihorize(ROLES.Tenant),
+  upload.array("photos", 5),
+  validate(createMaintenanceSchema),
+  maintainanceController.createMaintenance
+);
 router.get('/alerts',authenticate,autihorize(ROLES.Admin,ROLES.Manager),maintainanceController.getMaintenanceAlert)
 router.get('/insights',authenticate,autihorize(ROLES.Manager),
     maintainanceController.getManagerInsights)
-router.post('/',authenticate,autihorize(ROLES.Tenant),validate(createMaintenanceSchema),maintainanceController.createMaintenance)
 
 router.get(
     "/",

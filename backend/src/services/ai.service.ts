@@ -7,7 +7,7 @@ const ai = new GoogleGenAI({
 });
 export const analyseMaintenaceRequest = async(description:string):Promise<MaintenanceAiResult> =>{
     const response  = await ai.models.generateContent({
-        model:"gemini-2.5-flash",
+        model:"gemini-3-flash-preview",
         contents:`
         Analyze this property maintenance request:
 

@@ -13,6 +13,7 @@ function CreateMaintenancePage() {
   const [propertyId, setPropertyId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [photos, setPhotos] = useState<File[]>([]);
   const [properties, setProperties] = useState<AvailableProperty[]>([]);
   const [isLoadingProperties, setIsLoadingProperties] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,6 +35,49 @@ function CreateMaintenancePage() {
 
     void loadProperties();
   }, []);
+
+  const handlePhotoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedFiles = Array.from(event.target.files ?? []);
+    event.target.value = "";
+
+    if (selectedFiles.length === 0) return;
+
+    if (photos.length + selectedFiles.length > 5) {
+      setError("You can upload a maximum of 5 photos.");
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const invalidFile = selectedFiles.find(
+      (file) => !allowedTypes.includes(file.type)
+    );
+
+    if (invalidFile) {
+      setError("Only JPEG, PNG, and WebP images are allowed.");
+      return;
+    }
+
+    const oversizedFile = selectedFiles.find(
+      (file) => file.size > 5 * 1024 * 1024
+    );
+
+    if (oversizedFile) {
+      setError("Each photo must be 5 MB or smaller.");
+      return;
+    }
+
+    setError(null);
+    setPhotos((currentPhotos) => [...currentPhotos, ...selectedFiles]);
+  };
+
+  const removePhoto = (indexToRemove: number) => {
+    setPhotos((currentPhotos) =>
+      currentPhotos.filter((_, index) => index !== indexToRemove)
+    );
+    setError(null);
+  };
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>
@@ -59,36 +103,39 @@ function CreateMaintenancePage() {
     try {
       setIsSubmitting(true);
 
-      const maintenance = await createMaintenanceRequest({
-        propertyId,
-        title: title.trim(),
-        description: description.trim(),
-      });
+      const maintenance = await createMaintenanceRequest(
+        {
+          propertyId,
+          title: title.trim(),
+          description: description.trim(),
+        },
+        photos
+      );
 
       navigate(`/maintenance/${maintenance._id}`, { replace: true });
     } catch (error) {
-     console.error("Failed to create maintenance request:", error);
+      console.error("Failed to create maintenance request:", error);
 
-  const apiError = error as {
-    response?: {
-      data?: {
-        code?: string;
-        message?: string;
+      const apiError = error as {
+        response?: {
+          data?: {
+            code?: string;
+            message?: string;
+          };
+        };
       };
-    };
-  };
 
-  if (apiError.response?.data?.code === "AI_SERVICE_BUSY") {
-    window.alert(
-      "AI is currently busy. Please create your maintenance request later."
-    );
-    return;
-  }
+      if (apiError.response?.data?.code === "AI_SERVICE_BUSY") {
+        window.alert(
+          "AI is currently busy. Please create your maintenance request later."
+        );
+        return;
+      }
 
-  setError(
-    apiError.response?.data?.message ??
-      "Failed to create maintenance request. Please try again later."
-  );
+      setError(
+        apiError.response?.data?.message ??
+          "Failed to create maintenance request. Please try again later."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -109,7 +156,11 @@ function CreateMaintenancePage() {
       </div>
 
       <div className="card">
-        {error && <div className="alert-error">{error}</div>}
+        {error && (
+          <div className="alert-error" role="alert">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -188,6 +239,73 @@ function CreateMaintenancePage() {
             />
           </div>
 
+          <div className="form-group">
+            <label className="form-label" htmlFor="photos">
+              Attach Photos (Optional)
+            </label>
+            <input
+              id="photos"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={handlePhotoChange}
+              disabled={isSubmitting || photos.length >= 5}
+            />
+            <p className="page-header-subtitle">
+              JPEG, PNG, or WebP. Maximum 5 photos, 5 MB per photo.
+            </p>
+
+            {photos.length > 0 && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+                  gap: "0.75rem",
+                  marginTop: "1rem",
+                }}
+              >
+                {photos.map((photo, index) => (
+                  <div
+                    key={`${photo.name}-${photo.lastModified}-${index}`}
+                    style={{
+                      border: "1px solid var(--border-color, #ddd)",
+                      borderRadius: "8px",
+                      padding: "0.5rem",
+                      minWidth: 0,
+                    }}
+                  >
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt={`Maintenance photo ${index + 1}`}
+                      style={{
+                        width: "100%",
+                        height: "100px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                    />
+                    <p
+                      style={{
+                        fontSize: "0.8rem",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      {photo.name}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => removePhoto(index)}
+                      disabled={isSubmitting}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -218,7 +336,6 @@ function CreateMaintenancePage() {
                 ? "Submitting Request..."
                 : "Submit Maintenance Ticket"}
             </button>
-            
           </div>
         </form>
       </div>

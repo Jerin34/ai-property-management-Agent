@@ -10,6 +10,7 @@ export interface IMaintainance{
     tenant:mongoose.Types.ObjectId;
     title:string;
     description:string;
+     photos?:string[];
      aiSummary:string;
     category:MaintenanceCategory;
     priority:MaintenancePriority;
@@ -44,6 +45,10 @@ const maintainanceSchema = new Schema<IMaintainance>({
         type:String,
         required:true,
         trim:true,
+    },
+    photos:{
+        type:[String],
+       default:[],
     },
        aiSummary:{
         type:String,

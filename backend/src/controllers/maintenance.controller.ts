@@ -3,27 +3,63 @@ import { createMaintenanceReq,getMaintenanceReq,getMaintenanceReqById,assignTech
 import { recommendTechnicians } from '../services/recommendation.service.js'
 import  { ROLES } from '../constants/roles.js'
 import { MaintenanceAlertService } from '../services/maintenace-Alert_services.js'
+import uploadImage from '../services/upload.service.js'
 import { detectRecurringMaintenace } from "../services/recurring.service.js";
 import Property from '../models/property.models.js'
 import Maintenance from '../models/maintenance.model.js'
-export const createMaintenance = async(req:Request,res:Response) :Promise<void> =>{
-    try{
-    const user = req.user
-    if(!user){
-        res.status(401).json({success:false,message:'Authentication is Required'})
-        return ;
-    }
-    const maintenance = await createMaintenanceReq(
-        req.body,
-        user.userId
-    );
-     res.status(201).json({
+
+
+export const createMaintenance = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            res.status(401).json({
+                success: false,
+                message: "Authentication is Required",
+            });
+            return;
+        }
+
+        const files = (req.files ?? []) as Express.Multer.File[];
+console.log("Uploaded files received:", files.length);
+console.log(
+  "File details:",
+  files.map((file) => ({
+    originalname: file.originalname,
+    mimetype: file.mimetype,
+    size: file.size,
+  }))
+);
+        // Upload photos to Cloudinary.
+        const uploadedPhotos = await Promise.all(
+            files.map((file) => uploadImage(file.buffer))
+        );
+
+        const maintenance = await createMaintenanceReq(
+            req.body,
+            user.userId
+        );
+
+        // Save the uploaded photo URLs.
+        if (uploadedPhotos.length > 0) {
+            maintenance.photos = uploadedPhotos.map(
+                (photo) => photo.secure_url
+            );
+
+            await maintenance.save();
+        }
+
+        res.status(201).json({
             success: true,
             message: "Maintenance Request Created Successfully",
             data: maintenance,
-     })
-    }catch(err){
-       console.error("Create maintenance request failed:", err);
+        });
+    } catch (err) {
+        console.error("Create maintenance request failed:", err);
 
         const apiError = err as {
             status?: number;
@@ -62,10 +98,9 @@ export const createMaintenance = async(req:Request,res:Response) :Promise<void> 
             success: false,
             message: "Failed to create maintenance request. Please try again later.",
         });
-
-    };
-
+    }
 };
+
 
 export const getMaintnence = async (
     req: Request,

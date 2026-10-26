@@ -82,14 +82,39 @@ export const getMaintenanceById = async (
  * Available to:
  * TENANT
  */
+
 export const createMaintenanceRequest = async (
-  data: CreateMaintenanceInput
+  data: CreateMaintenanceInput,
+  photos: File[] = []
 ): Promise<Maintenance> => {
-  const response =
-    await apiClient.post<MaintenanceResponse>(
-      "/maintenance",
-      data
-    );
+  const formData = new FormData();
+
+  formData.append("propertyId", data.propertyId);
+  formData.append("title", data.title);
+  formData.append("description", data.description);
+
+  photos.forEach((photo) => {
+    formData.append("photos", photo);
+  });
+console.log("Photos selected:", photos.length);
+console.log(
+  "FormData entries:",
+  Array.from(formData.entries()).map(([key, value]) => ({
+    key,
+    value:
+      value instanceof File
+        ? {
+            name: value.name,
+            type: value.type,
+            size: value.size,
+          }
+        : value,
+  }))
+);
+  const response = await apiClient.post<MaintenanceResponse>(
+    "/maintenance",
+    formData
+  );
 
   return response.data.data;
 };

@@ -235,6 +235,54 @@ function MaintenanceDetailsPage() {
                 {maintenance.aiSummary === null ? "No AI summary available." : maintenance.aiSummary}
               </p>
             </div>
+            
+          {/* Maintenance Photos Card */}
+          <div className="card">
+            <h3 className="card-title">Maintenance Photos</h3>
+
+            {maintenance.photos && maintenance.photos.length > 0 ? (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+                  gap: "1rem",
+                }}
+              >
+                {maintenance.photos.map((photoUrl, index) => (
+                  <a
+                    key={`${photoUrl}-${index}`}
+                    href={photoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "block",
+                      borderRadius: "8px",
+                      overflow: "hidden",
+                      border: "1px solid var(--border)",
+                    }}
+                    aria-label={`Open maintenance photo ${index + 1} in a new tab`}
+                  >
+                    <img
+                      src={photoUrl}
+                      alt={`Maintenance issue photo ${index + 1}`}
+                      loading="lazy"
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: "var(--text-muted)", margin: 0 }}>
+                No photos have been attached to this maintenance request.
+              </p>
+            )}
+          </div>
+
           </div>
 
           {/* Request Information Meta Card */}

@@ -42,6 +42,7 @@ export interface Maintenance {
 
   title: string;
   description: string;
+  photos?: string[];
   aiSummary: string;
 
   category: MaintenanceCategory;

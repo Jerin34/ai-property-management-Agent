@@ -14,6 +14,12 @@ if(RAZORPAY_KEY_SECRET === undefined) throw new Error('RAZORPAY_KEY_SECRET is no
 if(RAZORPAY_PLAN_ID === undefined) throw new Error('RAZORPAY_PLAN_ID is not defined')
     const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET
 if(RAZORPAY_WEBHOOK_SECRET === undefined) throw new Error('RAZORPAY_WEBHOOK_SECRET is not defined')
+    const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME
+if(CLOUDINARY_CLOUD_NAME === undefined) throw new Error('CLOUDINARY_CLOUD_NAME is not defined')
+    const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY
+if(CLOUDINARY_API_KEY === undefined) throw new Error('CLOUDINARY_API_KEY is not defined')
+    const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET
+if(CLOUDINARY_API_SECRET === undefined) throw new Error('CLOUDINARY_API_SECRET is not defined')
     const env = {
         PORT,
         MONGODB_URI,
@@ -22,6 +28,9 @@ if(RAZORPAY_WEBHOOK_SECRET === undefined) throw new Error('RAZORPAY_WEBHOOK_SECR
         RAZORPAY_KEY_ID,
         RAZORPAY_KEY_SECRET,
         RAZORPAY_PLAN_ID,
-        RAZORPAY_WEBHOOK_SECRET
+        RAZORPAY_WEBHOOK_SECRET,
+        CLOUDINARY_CLOUD_NAME,
+        CLOUDINARY_API_KEY,
+        CLOUDINARY_API_SECRET,
     }
     export default env
