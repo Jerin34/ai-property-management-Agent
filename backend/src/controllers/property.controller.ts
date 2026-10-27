@@ -1,5 +1,5 @@
 import type {Request,Response} from 'express';
-import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService,getAvailableProperties} from '../services/property.service.js';
+import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService,getAvailableProperties,acitivateProperty as activatePropertyService} from '../services/property.service.js';
 import { PropertyHealthService } from '../services/property-health.services.js'
 import {ROLES} from '../constants/roles.js'
 import { ManagerCopilotService } from '../services/manager-copilot.services.js';
@@ -149,55 +149,113 @@ export const updateProperty =async (req:Request,res:Response):Promise<void> =>{
         });
     }
 };
-export const deactivateProperty =async (req:Request,res:Response):Promise<void> =>{
-    try{
-        const user = req.user;
-        if(!user){
+export const deactivateProperty = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        if (!req.user) {
             res.status(401).json({
-                success:false,
-                message:"Authentication Required"
-            })
-              return ;
-        }
-            const propertyId = req.params.id.toString();
-            const property = await getPropertyByIdService(propertyId)
-            if (
-            user.role !== ROLES.Admin &&
-            property.manager.toString() !== user.userId
-        ) {
-            res.status(403).json({
                 success: false,
-                message: "You are not allowed to deactivate this Property"
+                message: "Unauthorized",
             });
             return;
         }
-      const deactivatedProperty = await deactivatePropertyService(propertyId);
-              res.status(200).json({
+
+        const id = String(req.params.id);
+        const property = await getPropertyByIdService(id);
+
+        if (
+            req.user.role !== ROLES.Admin &&
+            property.manager.toString() !== req.user.userId
+        ) {
+            res.status(403).json({
+                success: false,
+                message: "You are not allowed to deactivate this property",
+            });
+            return;
+        }
+
+        const deactivatedProperty = await deactivatePropertyService(id);
+
+        res.status(200).json({
             success: true,
             message: "Property deactivated successfully",
-            data:deactivatedProperty
+            data: deactivatedProperty,
         });
-    }
-    catch (err) {
+    } catch (error) {
+        console.error("Deactivate property error:", error);
+
+        const message =
+            error instanceof Error ? error.message : "Internal Server Error";
+
         if (
-            err instanceof Error &&
-            err.message === "Property not found"
+            message === "Property Not Found" ||
+            message === "Property not found"
         ) {
             res.status(404).json({
                 success: false,
-                message: "Property not found"
+                message: "Property Not Found",
             });
             return;
         }
 
         res.status(500).json({
             success: false,
-            message: "Internal Server Error"
+            message: "Failed to deactivate property",
         });
     }
+};
+export const activateProperty =async (req:Request,res:Response):Promise<void> => {
+    try{
+        if(!req.user){
+             res.status(401).json({
+                success:false,
+                message:"UnAuthorized"
+            })
+            return;
+        }
+        const propertyid = req.params.id.toString();
+        const property = await getPropertyByIdService(propertyid);
+        if(req.user.role !== ROLES.Admin  && property.manager.toString() !== req.user.userId){
+             res.status(403).json({
+                success:false,
+                message:"You are not allowed to activate this Property"
+            })
+            return;
+        }
+        const activatetheProperty = await activatePropertyService(propertyid);
+        res.status(200).json({
+            success:true,message:'Property Activated SuccessFully',
+            data:activatetheProperty
+        })
+    }
+   catch (error) {
+    console.error("Activate property error:", error);
 
+    const message =
+        error instanceof Error ? error.message : "Internal Server Error";
 
+    if (
+        message === "Property Not Found" ||
+        message === "Property not found"
+    ) {
+        res.status(404).json({
+            success: false,
+            message: "Property Not Found",
+        });
+        return;
+    }
+
+    res.status(500).json({
+        success: false,
+        message: "Failed to Activate Property",
+    });
 }
+    }
+
+    
+
 export const getPropertyHealth = async(req:Request,res:Response):Promise<void> =>{
     try{
         const propertyId = req.params.id.toString();

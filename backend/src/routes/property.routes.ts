@@ -15,6 +15,12 @@ router.get(
 );
 router.get("/my",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.getProperties)
 router.patch("/:id/deactivate",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.deactivateProperty)
+router.patch(
+    "/:id/activate",
+    authenticate,
+    autihorize(ROLES.Admin, ROLES.Manager),
+    propertyController.activateProperty
+);
 router.get(
     "/:id",
     authenticate,

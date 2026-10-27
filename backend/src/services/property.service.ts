@@ -19,7 +19,7 @@ export const getAvailableProperties = async () => {
 export const getPropertyByid = async(propertyId:string)=>{
     const property = await Property.findById(propertyId);
     if(!property){
-        throw new Error("Property Not Find")
+        throw new Error("Property not found")
     }
     return property;
 }
@@ -38,19 +38,32 @@ export const updateProperty = async (propertyId:string,data:updatePropertyInput)
     return property;
 
 }
-export const deactivateProperty = async(propertyId:string) =>{
+export const deactivateProperty = async (propertyId: string) => {
     const property = await Property.findByIdAndUpdate(
         propertyId,
-        {
-            isActive:false
+        { isActive: false },
+        { returnDocument: "after" }
+    );
+
+    if (!property) {
+        throw new Error("Property Not Found");
+    }
+
+    return property;
+};
+export const acitivateProperty = async(propertyId:string) =>{
+    const property = await Property.findByIdAndUpdate(
+       propertyId,
+       {
+            isActive:true
         },
         {
-            new:true
+            returnDocument:"after",
+            runValidators:true
         }
-
     )
     if(!property){
         throw new Error("Property not found")
     }
-    return property;
+    return property
 }

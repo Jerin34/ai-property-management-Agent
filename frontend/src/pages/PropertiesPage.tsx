@@ -67,7 +67,17 @@ function PropertiesPage() {
       ) : (
         <div className="grid-cards">
           {properties.map((property) => (
-            <PropertyCard key={property._id} property={property} />
+          <PropertyCard
+  key={property._id}
+  property={property}
+  onStatusChange={(updatedProperty) => {
+    setProperties((previousProperties) =>
+      previousProperties.map((item) =>
+        item._id === updatedProperty._id ? updatedProperty : item
+      )
+    );
+  }}
+/>
           ))}
         </div>
       )}

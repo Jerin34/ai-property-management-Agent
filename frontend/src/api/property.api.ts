@@ -79,4 +79,11 @@
         const response = await apiClient.get<PropertyCopilotResponse>(`/properties/${id}/copilot`);
         return response.data.data;
     }
-    
+export const activateProperty = async(id:string) =>{
+    const response =  await apiClient.patch(`/properties/${id}/activate`);
+    return response.data;
+}
+export const deactivateProperty = async(id:string) =>{
+    const resposne = await apiClient.patch(`/properties/${id}/deactivate`);
+    return resposne.data;
+}
