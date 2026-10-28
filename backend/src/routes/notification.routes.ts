@@ -18,7 +18,7 @@ router.post(
     autihorize(ROLES.Admin,ROLES.Manager),
     createNotifications
 );
-router.post("/generate_from_alerts",authenticate,autihorize(ROLES.Admin,ROLES.Manager),generateNotification);
+router.post("/generate_from_alerts",authenticate,autihorize(ROLES.Admin),generateNotification);
 router.get(
     "/",
     authenticate,

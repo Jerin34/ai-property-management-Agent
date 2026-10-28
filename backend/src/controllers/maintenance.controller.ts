@@ -444,17 +444,38 @@ export const detectRecurring = async (
     }
 };
 
-export const getMaintenanceAlert = async(req:Request,res:Response):Promise<void> =>{
-    try{
-   
-    const alerts = await MaintenanceAlertService()
-    res.status(200).json({
-        success:true,data:alerts
-    })
-    
-}catch(err){
-    res.status(500).json({
-        success:false,message:'Internal Server Error'
-    })
-}
-}
+export const getMaintenanceAlert = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            res.status(401).json({
+                success: false,
+                message: "Authentication required"
+            });
+            return;
+        }
+
+        const scope =
+            user.role === ROLES.Admin
+                ? { mode: "admin" as const }
+                : { mode: "manager" as const, managerId: user.userId };
+
+        const alerts = await MaintenanceAlertService(scope);
+
+        res.status(200).json({
+            success: true,
+            data: alerts
+        });
+    } catch (err) {
+        console.error("Failed to fetch maintenance alerts:", err);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};

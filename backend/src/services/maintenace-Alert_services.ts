@@ -1,15 +1,38 @@
+
 import Maintaince from "../models/maintenance.model.js";
+import Property from "../models/property.models.js";
 import { PropertyHealthService } from "./property-health.services.js";
-import { MaintenanceAlertType} from "../types/maintenance-alert.types.js";
+import { MaintenanceAlertType } from "../types/maintenance-alert.types.js";
 
-export const MaintenanceAlertService = async (): Promise<MaintenanceAlertType[]> => {
+type MaintenanceAlertScope =
+    | { mode: "manager"; managerId: string }
+    | { mode: "admin" | "system" };
 
-    const maintenanceRequests = await Maintaince.find();
+export const MaintenanceAlertService = async (
+    scope: MaintenanceAlertScope
+): Promise<MaintenanceAlertType[]> => {
+    let managerPropertyIds;
+
+    if (scope.mode === "manager") {
+        managerPropertyIds = await Property.find({
+            manager: scope.managerId
+        }).distinct("_id");
+
+        // A manager with no properties must not receive global alerts.
+        if (managerPropertyIds.length === 0) {
+            return [];
+        }
+    }
+
+    const maintenanceRequests = await Maintaince.find(
+        scope.mode === "manager"
+            ? { property: { $in: managerPropertyIds } }
+            : {}
+    );
 
     const alerts: MaintenanceAlertType[] = [];
 
     for (const request of maintenanceRequests) {
-
         if (request.priority === "EMERGENCY") {
             alerts.push({
                 propertyId: request.property.toString(),
@@ -22,8 +45,7 @@ export const MaintenanceAlertService = async (): Promise<MaintenanceAlertType[]>
 
         if (
             request.priority === "HIGH" &&
-            (request.status === "OPEN" ||
-             request.status === "IN_PROGRESS")
+            (request.status === "OPEN" || request.status === "IN_PROGRESS")
         ) {
             alerts.push({
                 propertyId: request.property.toString(),
@@ -37,14 +59,11 @@ export const MaintenanceAlertService = async (): Promise<MaintenanceAlertType[]>
 
     const propertyIds = [
         ...new Set(
-            maintenanceRequests.map(
-                request => request.property.toString()
-            )
+            maintenanceRequests.map(request => request.property.toString())
         )
     ];
 
     for (const propertyId of propertyIds) {
-
         const health = await PropertyHealthService(propertyId);
 
         if (health.healthScore < 60) {

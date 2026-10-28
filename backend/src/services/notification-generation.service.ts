@@ -7,7 +7,7 @@ import NotificationPreferenceModel from "../models/notification_preferences.mode
 
 export const generateNotificationsFromAlerts = async () => {
 
-    const alerts = await MaintenanceAlertService();
+    const alerts = await MaintenanceAlertService({mode: "system" });
 
     const notifications = [];
 
