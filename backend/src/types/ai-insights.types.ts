@@ -1,7 +1,7 @@
-export interface AIManagerInsights{
-    totalRequests:number;
-    emergencyRequest:number;
-    highPriorityRequests:number;
-    insights:string;
-    recommendation:string[]
+export interface AIManagerInsights {
+    totalRequests: number;
+    emergencyRequests: number;
+    highPriorityRequests: number;
+    insights: string;
+    recommendations: string[];
 }
