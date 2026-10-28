@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import Maintenance from "../models/maintenance.model.js";
 import { MaintenanceCostPrediction } from '../types/maintenance_cost_prediction.types.js'
 const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY
+    apiKey: process.env.GEMINI_API_KEY
 })
 export const predictMaintenanceCost = async(maintenanceId:string):Promise<MaintenanceCostPrediction> => {
     const maintenance = await Maintenance.findById(maintenanceId);

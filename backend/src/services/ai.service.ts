@@ -32,7 +32,53 @@ Classify the issue and return ONLY valid JSON in this format:
     .replace(/```/g, "")
     .trim();
 
-return JSON.parse(cleanText) as MaintenanceAiResult;
+  const result: unknown = JSON.parse(cleanText);
+
+    if (
+        typeof result !== "object" ||
+        result === null ||
+        !("category" in result) ||
+        !("priority" in result) ||
+        !("summary" in result)
+    ) {
+        throw new Error("AI returned an invalid response structure");
+    }
+
+    const { category, priority, summary } = result;
+
+    const validCategories = [
+        "PLUMBING",
+        "ELECTRICAL",
+        "HVAC",
+        "APPLIANCE",
+        "STRUCTURAL",
+        "OTHER",
+    ];
+
+    const validPriorities = [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "EMERGENCY",
+    ];
+
+    if (
+        typeof category !== "string" ||
+        !validCategories.includes(category) ||
+        typeof priority !== "string" ||
+        !validPriorities.includes(priority) ||
+        typeof summary !== "string" ||
+        !summary.trim()
+    ) {
+        throw new Error("AI returned invalid classification values");
+    }
+
+    return {
+        category: category as MaintenanceAiResult["category"],
+        priority: priority as MaintenanceAiResult["priority"],
+        summary: summary.trim(),
+    };
+
 };
 
 export const gnerateManagerInsights = async(requests:unknown[]):Promise<AIManagerInsights> => {

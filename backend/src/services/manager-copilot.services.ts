@@ -3,7 +3,7 @@ import Maintaince from "../models/maintenance.model.js";
 import mongoose from "mongoose";
 import { PropertyHealthService } from "./property-health.services.js";
 import { GoogleGenAI } from "@google/genai";
-const ai = new GoogleGenAI({apiKey: process.env.GOOGLE_API_KEY});
+const ai = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY});
 
 export const ManagerCopilotService  =  async(propertyId:string)=>{
     const property = await Property.findById(propertyId);

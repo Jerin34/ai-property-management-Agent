@@ -5,16 +5,26 @@ import type { createMaintenanceInput } from "../validator/maintenance.validator.
 import { analyseMaintenaceRequest } from "./ai.service.js";
 import {ROLES} from '../constants/roles.js'
 import type { Role } from "../constants/roles.js";
+import {ClassifyMaintenanceRequest} from '../utils/maintenance-classifier.js'
 import { MAINTENANCE_STATUS } from "../constants/maintenance.js";
+import type {MaintenanceAiResult} from '../types/ai.types.js'
 import { gnerateManagerInsights } from './ai.service.js'
 
 export const createMaintenanceReq = async(data:createMaintenanceInput,tenantId:string) =>{
+ 
     const property = await Property.findById(data.propertyId)
     if(!property){
         throw new Error("Property not found")
     }
-    const aiResult = await analyseMaintenaceRequest(data.description);
-    const maintenance = Maintaince.create({
+       let classification:MaintenanceAiResult;
+       try{
+        classification = await analyseMaintenaceRequest(data.description);
+       }catch(err){
+        console.error("Gemini maintenance classification failed.Using fallback",err);
+        classification = ClassifyMaintenanceRequest(data.description)
+       };
+       const aiResult = classification
+    const maintenance = await Maintaince.create({
         property:data.propertyId,
         tenant:tenantId,
         title:data.title,
