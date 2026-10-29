@@ -47,6 +47,11 @@ export const maintenanceDailyQuotaLimiter = async (
             },
         },
     ];
+    const updateCounter = (upsert: boolean) =>
+        MaintenanceDailyQuota.findOneAndUpdate(filter, update, {
+            upsert,
+            new: true,
+        });
 
     try {
         /*
@@ -54,14 +59,7 @@ export const maintenanceDailyQuotaLimiter = async (
          * reading the same old count and all passing the limit. Every
          * schema-valid submission attempt is counted, including denied attempts.
          */
-        let quota;
-        try {
-            quota = await MaintenanceDailyQuota.findOneAndUpdate(
-                filter,
-                update,
-                { upsert: true, new: true },
-            );
-        } catch (error) {
+        const quota = await updateCounter(true).catch(async (error: unknown) => {
             /*
              * Two first-ever requests can race to create the unique tenant/day
              * counter. If one wins the insert, retry the loser as an update.
@@ -76,12 +74,8 @@ export const maintenanceDailyQuotaLimiter = async (
                 throw error;
             }
 
-            quota = await MaintenanceDailyQuota.findOneAndUpdate(
-                filter,
-                update,
-                { upsert: false, new: true },
-            );
-        }
+            return updateCounter(false);
+        });
 
         if (!quota) {
             next(new Error("Could not update the maintenance daily quota."));
