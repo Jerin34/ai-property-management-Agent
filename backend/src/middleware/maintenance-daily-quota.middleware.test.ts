@@ -41,7 +41,7 @@ describe("maintenanceDailyQuotaLimiter", () => {
         expect(MaintenanceDailyQuota.findOneAndUpdate).toHaveBeenCalledWith(
             expect.objectContaining({
                 tenantId: "507f1f77bcf86cd799439011",
-                dateKey: expect.stringMatching(/^\\d{4}-\\d{2}-\\d{2}$/),
+                dateKey: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
             }),
             expect.arrayContaining([
                 expect.objectContaining({
