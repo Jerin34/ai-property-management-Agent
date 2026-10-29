@@ -51,6 +51,8 @@ export const maintenanceDailyQuotaLimiter = async (
         MaintenanceDailyQuota.findOneAndUpdate(filter, update, {
             upsert,
             new: true,
+            // Mongoose requires this option when the update argument is an aggregation pipeline.
+            updatePipeline: true,
         });
 
     try {
