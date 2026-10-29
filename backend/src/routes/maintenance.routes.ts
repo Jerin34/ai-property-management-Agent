@@ -6,7 +6,8 @@ import {validate} from '../middleware/validator.middleware.js'
 import upload from '../middleware/upload.middleware.js'
 import { createMaintenanceSchema,AssignTechnicianSchema ,UpdatesTechnicianStatusSchema } from "../validator/maintenance.validator.js";
 import * as maintainanceController from '../controllers/maintenance.controller.js'
-import { maintenanceIpLimiter,maintenanceTenantLimiter } from "../middleware/maintenance-rate-limit.middleware.js";
+import { maintenanceIpLimiter, maintenanceTenantLimiter } from "../middleware/maintenance-rate-limit.middleware.js";
+import { maintenanceDailyQuotaLimiter } from "../middleware/maintenance-daily-quota.middleware.js";
 const router = Router()
 router.post(
   "/",
@@ -16,6 +17,7 @@ router.post(
   maintenanceTenantLimiter,
   upload.array("photos", 5),
   validate(createMaintenanceSchema),
+  maintenanceDailyQuotaLimiter,
   maintainanceController.createMaintenance
 );
 router.get('/alerts',authenticate,autihorize(ROLES.Admin,ROLES.Manager),maintainanceController.getMaintenanceAlert)
