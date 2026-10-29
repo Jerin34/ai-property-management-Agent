@@ -9,6 +9,7 @@ import {ClassifyMaintenanceRequest} from '../utils/maintenance-classifier.js'
 import { MAINTENANCE_STATUS } from "../constants/maintenance.js";
 import type {MaintenanceAiResult} from '../types/ai.types.js'
 import { gnerateManagerInsights } from './ai.service.js'
+import { createNotification } from './notification.services.js'
 
 export const createMaintenanceReq = async(data:createMaintenanceInput,tenantId:string) =>{
  
@@ -79,6 +80,23 @@ export const assignTechnician= async(maintenanceId:string,techicianId:string) =>
     maintenance.technician = technician._id
     maintenance.status = 'IN_PROGRESS'
     await maintenance.save();
+
+    // Notify the tenant that a technician has been assigned and work is underway.
+    try {
+        await createNotification({
+            recipient: maintenance.tenant.toString(),
+            maintenanceId: maintenance._id.toString(),
+            propertyId: maintenance.property.toString(),
+            type: "MAINTENANCE_ASSIGNED",
+            severity: "MEDIUM",
+            title: "Technician assigned",
+            message: `A technician has been assigned to "${maintenance.title}". Maintenance work is now in progress.`,
+            isRead: false,
+        });
+    } catch (error) {
+        console.error("Failed to notify tenant about technician assignment:", error);
+    }
+
     return maintenance;
 }
 export  const ViewTechnicianReq = async(technicianId:string) =>{
