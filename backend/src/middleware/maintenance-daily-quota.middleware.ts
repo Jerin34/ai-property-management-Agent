@@ -31,37 +31,57 @@ export const maintenanceDailyQuotaLimiter = async (
         Math.ceil((nextUtcMidnight.getTime() - now.getTime()) / 1000),
     );
 
+    const filter = {
+        tenantId: user.userId,
+        dateKey,
+    };
+    const update = [
+        {
+            $set: {
+                count: {
+                    $add: [{ $ifNull: ["$count", 0] }, 1],
+                },
+                expiresAt: {
+                    $literal: new Date(Date.now() + COUNTER_RETENTION_MS),
+                },
+            },
+        },
+    ];
+
     try {
         /*
-         * This is one atomic MongoDB update. Concurrent requests for the same
-         * tenant/day cannot read the same old count and all pass the limit.
-         * Denied attempts continue increasing the counter, so once exhausted
-         * the quota cannot reopen until the next UTC day.
+         * A single atomic MongoDB update prevents concurrent requests from
+         * reading the same old count and all passing the limit. Every
+         * schema-valid submission attempt is counted, including denied attempts.
          */
-        const quota = await MaintenanceDailyQuota.findOneAndUpdate(
-            {
-                tenantId: user.userId,
-                dateKey,
-            },
-            [
-                {
-                    $set: {
-                        count: {
-                            $add: [{ $ifNull: ["$count", 0] }, 1],
-                        },
-                        expiresAt: {
-                            $literal: new Date(
-                                Date.now() + COUNTER_RETENTION_MS,
-                            ),
-                        },
-                    },
-                },
-            ],
-            {
-                upsert: true,
-                new: true,
-            },
-        );
+        let quota;
+        try {
+            quota = await MaintenanceDailyQuota.findOneAndUpdate(
+                filter,
+                update,
+                { upsert: true, new: true },
+            );
+        } catch (error) {
+            /*
+             * Two first-ever requests can race to create the unique tenant/day
+             * counter. If one wins the insert, retry the loser as an update.
+             */
+            const isDuplicateKey =
+                typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                error.code === 11000;
+
+            if (!isDuplicateKey) {
+                throw error;
+            }
+
+            quota = await MaintenanceDailyQuota.findOneAndUpdate(
+                filter,
+                update,
+                { upsert: false, new: true },
+            );
+        }
 
         if (!quota) {
             next(new Error("Could not update the maintenance daily quota."));
