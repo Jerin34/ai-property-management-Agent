@@ -6,11 +6,14 @@ import {validate} from '../middleware/validator.middleware.js'
 import upload from '../middleware/upload.middleware.js'
 import { createMaintenanceSchema,AssignTechnicianSchema ,UpdatesTechnicianStatusSchema } from "../validator/maintenance.validator.js";
 import * as maintainanceController from '../controllers/maintenance.controller.js'
+import { maintenanceIpLimiter,maintenanceTenantLimiter } from "../middleware/maintenance-rate-limit.middleware.js";
 const router = Router()
 router.post(
   "/",
+  maintenanceIpLimiter,
   authenticate,
   autihorize(ROLES.Tenant),
+  maintenanceTenantLimiter,
   upload.array("photos", 5),
   validate(createMaintenanceSchema),
   maintainanceController.createMaintenance
