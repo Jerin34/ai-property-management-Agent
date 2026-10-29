@@ -24,6 +24,21 @@ export const createMaintenance = async (
             return;
         }
 
+        // Reject unknown or inactive properties before uploading photos or calling Gemini.
+        // Tenant-to-property authorization is deferred until the app has a tenant-property
+        // assignment model; selecting a property in the UI is not proof of ownership.
+        const selectedProperty = await Property.findById(req.body.propertyId)
+            .select("_id isActive");
+
+        if (!selectedProperty || !selectedProperty.isActive) {
+            res.status(404).json({
+                success: false,
+                code: "PROPERTY_NOT_AVAILABLE",
+                message: "This property is not available for maintenance requests.",
+            });
+            return;
+        }
+
         const files = (req.files ?? []) as Express.Multer.File[];
 console.log("Uploaded files received:", files.length);
 console.log(
