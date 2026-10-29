@@ -51,7 +51,7 @@ describe("maintenanceDailyQuotaLimiter", () => {
                     }),
                 }),
             ]),
-            { upsert: true, new: true },
+            { upsert: true, new: true, updatePipeline: true },
         );
         expect(next).toHaveBeenCalledOnce();
         expect(res.status).not.toHaveBeenCalled();
