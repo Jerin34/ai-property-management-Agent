@@ -6,12 +6,12 @@ function Navbar() {
   return (
     <header className="app-topbar">
       <div className="topbar-title">
-        <span>AI Property Management</span>
-        <span className="topbar-badge">Live Copilot</span>
+        <span>Workspace</span>
+        <span className="topbar-badge">AI-powered property operations</span>
       </div>
       <div className="topbar-user">
-        <span className="badge badge-neutral">Role: {user?.role || "GUEST"}</span>
-        <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--text-main)" }}>
+        <span className="badge badge-neutral">{user?.role || "GUEST"}</span>
+        <span style={{ fontWeight: 650, fontSize: "0.88rem", color: "var(--text-main)" }}>
           {user?.name}
         </span>
       </div>
