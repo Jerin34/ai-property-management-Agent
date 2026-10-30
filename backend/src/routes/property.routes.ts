@@ -5,7 +5,7 @@ import {autihorize} from '../middleware/role.middleware.js'
 import {ROLES} from '../constants/roles.js'
 import {createPropertySchema,updatePropertySchema} from  '../validator/property.validator.js'
 import * as propertyController from '../controllers/property.controller.js'
-import { assignTenantSchema } from '../validator/tenant-property-assignment.validator.js'
+import * as stayRequestController from '../controllers/property-stay-request.controller.js'
 const router = Router()
 router.post("/",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(createPropertySchema),propertyController.create)
 router.get("/browse", authenticate, autihorize(ROLES.Tenant), stayRequestController.browseProperties);
