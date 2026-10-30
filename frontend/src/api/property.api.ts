@@ -87,3 +87,10 @@ export const deactivateProperty = async(id:string) =>{
     const resposne = await apiClient.patch(`/properties/${id}/deactivate`);
     return resposne.data;
 }
+export const assignTenantToProperty = async (propertyId: string, tenantEmail: string) => {
+    const response = await apiClient.post(
+        `/properties/${propertyId}/tenants`,
+        { tenantEmail }
+    );
+    return response.data;
+};
