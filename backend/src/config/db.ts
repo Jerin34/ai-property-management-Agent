@@ -6,7 +6,7 @@ try{
     console.log('MongoDb Connected SuccessFully')
 }
 catch(err){
-    console.log('Connection Failed',err)
+    console.error('Connection Failed',err)
     process.exit(1)
 }
 }

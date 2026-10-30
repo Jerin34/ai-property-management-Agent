@@ -96,22 +96,7 @@ export const createMaintenanceRequest = async (
   photos.forEach((photo) => {
     formData.append("photos", photo);
   });
-console.log("Photos selected:", photos.length);
-console.log(
-  "FormData entries:",
-  Array.from(formData.entries()).map(([key, value]) => ({
-    key,
-    value:
-      value instanceof File
-        ? {
-            name: value.name,
-            type: value.type,
-            size: value.size,
-          }
-        : value,
-  }))
-);
-  const response = await apiClient.post<MaintenanceResponse>(
+const response = await apiClient.post<MaintenanceResponse>(
     "/maintenance",
     formData
   );

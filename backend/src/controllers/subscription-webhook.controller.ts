@@ -32,10 +32,6 @@ const handleWebhook = async(req:Request,res:Response):Promise<void>=>{
         let eventData :unknown;
         try{
             eventData = JSON.parse(req.body.toString("utf8"));
-            console.log("Razorpay webhook received:", {
-  event: (eventData as { event: string }).event,
-  receivedAt: new Date().toISOString(),
-});
         }catch{
             res.status(400).json({
                 success:false,message:"Invalid webhook JSON"

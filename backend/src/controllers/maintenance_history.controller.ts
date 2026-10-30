@@ -2,7 +2,6 @@ import { Request,Response } from "express";
 import { getMaintenaceHistory } from '../services/maintenace_history.services.js'
 export const viewMaintenanceHistory = async(req:Request,res:Response):Promise<void> =>{
     try{
-        console.log("Controller reached")
         const tenantId = req.user!.userId;
         const history = await getMaintenaceHistory(tenantId);
         res.status(200).json({
@@ -10,7 +9,7 @@ export const viewMaintenanceHistory = async(req:Request,res:Response):Promise<vo
         })
     }
     catch(err){
-        console.log("error printing",err)
+        console.error("Failed to fetch maintenance history:",err)
         res.status(500).json({
             success:false,
             message:"Internal Server Error"

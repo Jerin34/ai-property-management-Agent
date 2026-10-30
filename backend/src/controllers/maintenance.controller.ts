@@ -53,16 +53,7 @@ export const createMaintenance = async (
         }
 
         const files = (req.files ?? []) as Express.Multer.File[];
-console.log("Uploaded files received:", files.length);
-console.log(
-  "File details:",
-  files.map((file) => ({
-    originalname: file.originalname,
-    mimetype: file.mimetype,
-    size: file.size,
-  }))
-);
-        // Upload photos to Cloudinary.
+// Upload photos to Cloudinary.
         const uploadedPhotos = await Promise.all(
             files.map((file) => uploadImage(file.buffer))
         );
@@ -165,7 +156,7 @@ export const getMaintnence = async (
             data: maintenanceReq
         });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({
             success: false,
             message: "Internal Server Error"

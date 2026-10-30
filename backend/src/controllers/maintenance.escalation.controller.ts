@@ -5,7 +5,7 @@ export const getMaintenanceEscalation = async(req:Request,res:Response) => {
         const escalations = await ProcessmaintenanceEscaltion();
         res.status(200).json({success:true,data:escalations})
     }catch(err){
-        console.log(err)
+        console.error(err)
         res.status(500).json({success:false,message:"Internal Server Error"})
     }
 }

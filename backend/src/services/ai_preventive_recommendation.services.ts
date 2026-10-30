@@ -25,7 +25,6 @@ export const getAiPreventiveRecommendations = async(propertyId:string):Promise<A
         status: request.status,
         createdAt: request.createdAt
     }));
-    console.log("Maintenance History:", maintenanceHistory);
     const prompt = `
     You are an AI property maintenance advisor.
 
@@ -75,8 +74,6 @@ Rules:
     });
    const text = response.text?.trim();
 
-console.log("AI Response:", text);
-
 if (!text) {
     throw new Error("AI returned empty response");
 }
@@ -92,7 +89,6 @@ let result;
 try {
     result = JSON.parse(cleanedText);
 } catch {
-    console.error("Invalid JSON from AI:", cleanedText);
     throw new Error("AI returned invalid JSON");
 }
     if(!Array.isArray(result.recommendations)){

@@ -34,10 +34,6 @@ export const recommendTechnicians = async(category:string,priority:string,proper
         let distance = 20;
         let distancePenalty  =20;
         if(technician.location){
-            console.log("Technician latitude:", technician.location.latitude);
-console.log("Technician longitude:", technician.location.longitude);
-console.log("Property latitude:", propertyLatitude);
-console.log("Property longitude:", propertyLongitude);
             distance = calculateDistance(technician.location.latitude,technician.location.longitude,
                 propertyLatitude,propertyLongitude
 

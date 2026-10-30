@@ -57,7 +57,6 @@ const handleApply = async () => {
   if (axios.isAxiosError(err)) {
     const message = err.response?.data?.message;
 
-    console.log("Subscription error:", message);
     if (
   message === "User already has an active subscription" ||
   message === "You are already subscribed"

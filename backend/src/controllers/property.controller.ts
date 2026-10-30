@@ -291,7 +291,7 @@ export const ManagerCopilot = async(req:Request,res:Response):Promise<void> =>{
         const analysis = await ManagerCopilotService(propertyId);
         res.status(200).json({success:true,data:analysis});
     }catch(err){
-        console.log(err)
+        console.error(err)
         res.status(500).json({
             success:false,message:"Internal Server Error"
         })  

@@ -16,8 +16,7 @@ function PropertiesPage() {
         setError(null);
         const data = await getProperties();
         setProperties(data);
-      } catch (error) {
-        console.log("Error loading properties", error);
+      } catch {
         setError("Error loading properties");
       } finally {
         setIsLoading(false);

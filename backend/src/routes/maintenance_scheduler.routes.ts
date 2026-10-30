@@ -4,10 +4,6 @@ import authenticate from "../middleware/auth.middileware.js";
 import {autihorize} from '../middleware/role.middleware.js'
 import {ROLES} from '../constants/roles.js'
 const router = Router()
-router.use((req, res, next) => {
-    console.log("🔥 MAINTENANCE SCHEDULE ROUTER HIT:", req.method, req.originalUrl);
-    next();
-});
 router.post(
     "/",
     authenticate,

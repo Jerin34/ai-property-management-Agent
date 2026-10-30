@@ -83,7 +83,7 @@
     };
 
     return (
-      <div>
+      <div className="create-property-page">
         <div className="page-header">
           <div className="page-header-left">
             <h1 className="page-header-title">Create Property</h1>
@@ -93,115 +93,145 @@
           </div>
         </div>
 
-        {error && <div className="alert-error">{error}</div>}
+        {error && (
+          <div className="alert-error" role="alert">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="name">Property name *</label>
-            <input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              minLength={2}
-              maxLength={150}
-              required
-              disabled={isSubmitting}
-            />
+        <section className="card create-property-card" aria-labelledby="property-form-title">
+          <div className="create-property-form-intro">
+            <h2 id="property-form-title">Property details</h2>
+            <p>Enter the property name and address to add it to your portfolio.</p>
           </div>
 
-          <h3>Address</h3>
+          <form className="create-property-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="name">Property name *</label>
+              <input
+                className="form-control"
+                id="name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+                minLength={2}
+                maxLength={150}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="street">Street *</label>
-            <input
-              id="street"
-              name="address.street"
-              value={formData.address.street}
-              onChange={handleChange}
-              required
-              minLength={2}
-              disabled={isSubmitting}
-            />
-          </div>
+            <fieldset className="create-property-address">
+              <legend>Property address</legend>
+              <div className="create-property-address-grid">
+                <div className="form-group create-property-field-full">
+                  <label className="form-label" htmlFor="street">Street *</label>
+                  <input
+                    className="form-control"
+                    id="street"
+                    name="address.street"
+                    type="text"
+                    value={formData.address.street}
+                    onChange={handleChange}
+                    required
+                    minLength={2}
+                    disabled={isSubmitting}
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="city">City *</label>
-            <input
-              id="city"
-              name="address.city"
-              value={formData.address.city}
-              onChange={handleChange}
-              required
-              minLength={2}
-              disabled={isSubmitting}
-            />
-          </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="city">City *</label>
+                  <input
+                    className="form-control"
+                    id="city"
+                    name="address.city"
+                    type="text"
+                    value={formData.address.city}
+                    onChange={handleChange}
+                    required
+                    minLength={2}
+                    disabled={isSubmitting}
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="state">State *</label>
-            <input
-              id="state"
-              name="address.state"
-              value={formData.address.state}
-              onChange={handleChange}
-              required
-              minLength={2}
-              disabled={isSubmitting}
-            />
-          </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="state">State *</label>
+                  <input
+                    className="form-control"
+                    id="state"
+                    name="address.state"
+                    type="text"
+                    value={formData.address.state}
+                    onChange={handleChange}
+                    required
+                    minLength={2}
+                    disabled={isSubmitting}
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="postalcode">Postal code *</label>
-            <input
-              id="postalcode"
-              name="address.postalcode"
-              value={formData.address.postalcode}
-              onChange={handleChange}
-              required
-              minLength={2}
-              disabled={isSubmitting}
-            />
-          </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="postalcode">Postal code *</label>
+                  <input
+                    className="form-control"
+                    id="postalcode"
+                    name="address.postalcode"
+                    type="text"
+                    value={formData.address.postalcode}
+                    onChange={handleChange}
+                    required
+                    minLength={2}
+                    disabled={isSubmitting}
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="country">Country *</label>
-            <input
-              id="country"
-              name="address.country"
-              value={formData.address.country}
-              onChange={handleChange}
-              required
-              minLength={2}
-              disabled={isSubmitting}
-            />
-          </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="country">Country *</label>
+                  <input
+                    className="form-control"
+                    id="country"
+                    name="address.country"
+                    type="text"
+                    value={formData.address.country}
+                    onChange={handleChange}
+                    required
+                    minLength={2}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            </fieldset>
 
-          <div>
-            <label htmlFor="description">Description (optional)</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description ?? ""}
-              onChange={handleChange}
-              maxLength={500}
-              rows={4}
-              disabled={isSubmitting}
-            />
-          </div>
+            <div className="form-group create-property-description">
+              <label className="form-label" htmlFor="description">Description (optional)</label>
+              <textarea
+                className="form-control"
+                id="description"
+                name="description"
+                value={formData.description ?? ""}
+                onChange={handleChange}
+                maxLength={500}
+                rows={4}
+                disabled={isSubmitting}
+              />
+              <span className="create-property-help">Add a short note to help your team identify this property.</span>
+            </div>
 
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating property..." : "Create Property"}
-          </button>
-
-          <button
-            type="button"
-            disabled={isSubmitting}
-            onClick={() => navigate("/properties")}
-          >
-            Cancel
-          </button>
-        </form>
+            <div className="create-property-actions">
+              <button
+                className="btn btn-secondary"
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => navigate("/properties")}
+              >
+                Cancel
+              </button>
+              <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating property..." : "Create Property"}
+              </button>
+            </div>
+          </form>
+        </section>
       </div>
     );
   }

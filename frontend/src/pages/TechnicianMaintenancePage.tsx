@@ -16,8 +16,7 @@ function TechnicianMaintenancePage() {
         setError(null);
         const data = await getTechnicianMaintenanceRequests();
         setGetMaintenanceRequests(data);
-      } catch (err) {
-        console.log("Error loading maintenance requests", err);
+      } catch {
         setError("Error loading maintenance requests");
       } finally {
         setIsLoading(false);

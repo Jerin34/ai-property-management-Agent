@@ -37,8 +37,7 @@ if (trimmedMessage.length > 500) {
       });
       setMessage("");
       onUpdateCreated();
-    } catch (err) {
-      console.log("Error in creating Maintenance Updates", err);
+    } catch {
       setError("Failed to create maintenance update");
     } finally {
       setIsLoading(false);

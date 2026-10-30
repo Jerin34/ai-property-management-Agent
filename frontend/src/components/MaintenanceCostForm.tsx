@@ -46,8 +46,7 @@ function MaintenanceCostForm({
       setMaterialCost("");
 
       onCostUpdate();
-    } catch (err) {
-      console.log("Error updating maintenance cost", err);
+    } catch {
       setIsError("Failed to update maintenance cost");
     } finally {
       setIsSubmitting(false);

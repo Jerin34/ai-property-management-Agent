@@ -52,8 +52,6 @@ const processEventWebhook = async (
     ) {
         return;
     }
-    console.log("Processing subscription event:", eventData.event);
-
     const subscription = eventData.payload?.subscription?.entity;
 
     if (!subscription?.id) {

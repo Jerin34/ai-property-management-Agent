@@ -62,7 +62,6 @@ useEffect(() => {
     email: string,
     password: string
   ) => {
-    console.log("Login error",email)
     setIsLoading(true);
 
     try {
@@ -70,19 +69,13 @@ useEffect(() => {
         email,
         password,
       });
-      console.log("Login error",response)
       const { user, token } = response.data;
 
       storage.setToken(token);
 
       setToken(token);
       setUser(user);
-    } 
-    catch(error){
-      console.log("Login error",error)
-      throw error;
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };

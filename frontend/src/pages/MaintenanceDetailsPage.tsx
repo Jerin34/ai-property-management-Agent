@@ -72,13 +72,12 @@ function MaintenanceDetailsPage() {
             const recommendationData = await getTechnicianRecommendation(id);
             setRecommendations(recommendationData);
           } catch (err) {
-            console.log("Error loading technician recommendation", err);
+            console.error("Failed to load technician recommendation:", err);
           } finally {
             setIsRecommendationLoading(false);
           }
         }
-      } catch (err) {
-        console.log("Error loading maintenance requests", err);
+      } catch {
         setError("Failed to load maintenance requests");
       } finally {
         setIsLoading(false);
@@ -98,7 +97,7 @@ function MaintenanceDetailsPage() {
       const updatedMaintenance = await getMaintenanceById(maintenance._id);
       setMaintenance(updatedMaintenance);
     } catch (err) {
-      console.log("Failed to predict maintenance cost", err);
+      console.error("Failed to predict maintenance cost:", err);
     } finally {
       setIsPredictingCost(false);
     }
@@ -114,7 +113,7 @@ function MaintenanceDetailsPage() {
       });
       setMaintenance(updatedMaintenance);
     } catch (err) {
-      console.log("Failed to update maintenance status", err);
+      console.error("Failed to update maintenance status:", err);
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -452,7 +451,7 @@ function MaintenanceDetailsPage() {
                   const updatedMaintenance = await assignTechnician(id, { technicianId });
                   setMaintenance(updatedMaintenance);
                 } catch (err) {
-                  console.log("Technician Assignment error", err);
+                  console.error("Technician assignment failed:", err);
                 } finally {
                   setIsAssigning(false);
                 }

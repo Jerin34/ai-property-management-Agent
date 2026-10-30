@@ -54,7 +54,7 @@ export const generateNotification = async(req:Request,res:Response):Promise<void
         res.status(200).json({success:true,data:notifications});
     }
     catch(err){
-        console.log(err)
+        console.error(err)
         res.status(500).json({
             success:false,message:"Intenal Server Error"
         })
