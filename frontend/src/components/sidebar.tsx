@@ -2,6 +2,19 @@ import { NavLink } from "react-router-dom";
 import { NavigationItems } from "../routes/Navigation";
 import { useAuth } from "../context/Authcontext";
 
+const navigationIcons: Record<string, string> = {
+  Dashboard: "⌂",
+  "Tenant Requests": "↗",
+  "My Property": "⌂",
+  Properties: "▦",
+  Maintenance: "⌁",
+  Analytics: "▥",
+  "Cost Analytics": "◫",
+  notification: "◉",
+  "My Maintenance": "✓",
+  "Maintenance Schedules": "◷",
+};
+
 function Sidebar() {
   const { user, logout } = useAuth();
 
@@ -24,20 +37,28 @@ function Sidebar() {
   return (
     <aside className="app-sidebar">
       <div className="app-sidebar-header">
-        <div className="sidebar-logo-icon">AI</div>
+        <img
+          className="sidebar-brand-mark"
+          src="/propertyagent-mark.svg"
+          alt=""
+          aria-hidden="true"
+        />
         <div>
-          <h2 className="sidebar-logo-text">EstatePulse</h2>
-          <div className="sidebar-logo-sub">Property AI Agent</div>
+          <h2 className="sidebar-logo-text">PropertyAgent</h2>
+          <div className="sidebar-logo-sub">AI PROPERTY MANAGEMENT</div>
         </div>
       </div>
 
-      <nav className="app-sidebar-nav">
+      <nav className="app-sidebar-nav" aria-label="Main navigation">
         {visibleItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) => (isActive ? "active" : "")}
           >
+            <span className="sidebar-nav-icon" aria-hidden="true">
+              {navigationIcons[item.label] ?? "◇"}
+            </span>
             <span>{item.label}</span>
           </NavLink>
         ))}
@@ -45,9 +66,7 @@ function Sidebar() {
 
       <div className="app-sidebar-footer">
         <div className="sidebar-user-info">
-          <div className="sidebar-user-avatar">
-            {getInitials(user?.name)}
-          </div>
+          <div className="sidebar-user-avatar">{getInitials(user?.name)}</div>
           <div className="sidebar-user-details">
             <p className="sidebar-user-name">{user?.name || "User"}</p>
             <p className="sidebar-user-role">{user?.role || "GUEST"}</p>
