@@ -316,7 +316,7 @@ export const assignTenant = async (req: Request, res: Response): Promise<void> =
 
         const assignment = await assignTenantToProperty(
             propertyId,
-            req.body.tenantId,
+            req.body.tenantEmail,
             user.userId
         );
 
