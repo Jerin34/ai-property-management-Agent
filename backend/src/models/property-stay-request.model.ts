@@ -33,6 +33,12 @@ propertyStayRequestSchema.index(
     { unique: true, partialFilterExpression: { status: "PENDING" } }
 );
 
+
+propertyStayRequestSchema.index(
+    { tenant: 1 },
+    { unique: true, partialFilterExpression: { status: "PENDING" } }
+);
+
 const PropertyStayRequest = mongoose.model<IPropertyStayRequest>(
     "PropertyStayRequest",
     propertyStayRequestSchema
