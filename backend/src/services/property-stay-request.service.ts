@@ -18,15 +18,15 @@ export const createPropertyStayRequest = async (tenantId: string, propertyId: st
     const [property, tenant, activeAssignment, pendingRequest] = await Promise.all([
         Property.findOne({ _id: propertyId, isActive: true }),
         User.findById(tenantId),
-        TenantPropertyAssignment.findOne({ tenant: tenantId, property: propertyId, status: "ACTIVE" }),
-        PropertyStayRequest.findOne({ tenant: tenantId, property: propertyId, status: "PENDING" }),
+        TenantPropertyAssignment.findOne({ tenant: tenantId, status: "ACTIVE" }),
+        PropertyStayRequest.findOne({ tenant: tenantId, status: "PENDING" }),
     ]);
 
     if (!property) throw new Error("Property not found or inactive");
     if (!tenant || tenant.role !== ROLES.Tenant || !tenant.isActive) {
         throw new Error("An active tenant account is required");
     }
-    if (activeAssignment) throw new Error("You are already assigned to this property");
+    if (activeAssignment) throw new Error("You already have an assigned property");
     if (pendingRequest) throw new Error("You already have a pending request for this property");
 
     return PropertyStayRequest.create({ tenant: tenantId, property: propertyId, status: "PENDING" });
@@ -65,10 +65,9 @@ export const reviewPropertyStayRequest = async (
     if (decision === "APPROVE") {
         const existingAssignment = await TenantPropertyAssignment.findOne({
             tenant: request.tenant,
-            property: property._id,
             status: "ACTIVE",
         });
-        if (existingAssignment) throw new Error("Tenant is already assigned to this property");
+        if (existingAssignment) throw new Error("Tenant already has an assigned property");
 
         await TenantPropertyAssignment.create({
             tenant: request.tenant,
