@@ -51,6 +51,7 @@ export const maintenanceDailyQuotaLimiter = async (
         MaintenanceDailyQuota.findOneAndUpdate(filter, update, {
             upsert,
             new: true,
+             updatePipeline: true,
         });
 
     try {

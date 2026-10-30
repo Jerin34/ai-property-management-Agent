@@ -19,6 +19,16 @@ function AddMaintenanceUpdate({
       setError("Update Message Cannot Be Empty");
       return;
     }
+    const trimmedMessage = message.trim();
+   if (trimmedMessage.length < 10) {
+  setError("Update message must contain at least 10 characters.");
+  return;
+}
+
+if (trimmedMessage.length > 500) {
+  setError("Update message cannot exceed 500 characters.");
+  return;
+}
     try {
       setIsLoading(true);
       setError(null);

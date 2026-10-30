@@ -16,6 +16,9 @@ const NotificationSchema = new Schema <INotification>(
         "HIGH_PRIORITY_UNRESOLVED",
         "LOW_PROPERTY_HEALTH",
         "MAINTENANCE_ESCALATED",
+        "MAINTENANCE_REQUEST_CREATED",
+"TECHNICIAN_ASSIGNED",
+"MAINTENANCE_STARTED",
         "MAINTENANCE_BACKLOG"]
         },
         maintenanceId:{
