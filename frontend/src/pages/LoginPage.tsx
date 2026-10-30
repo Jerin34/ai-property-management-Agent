@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate ,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/Authcontext";
 
 function LoginPage() {
@@ -25,36 +25,35 @@ function LoginPage() {
     <div className="auth-wrapper">
       <div className="auth-card">
         <div className="auth-brand">
-          <div className="auth-logo">AI</div>
+          <div className="auth-logo">
+            <img src="/propertyagent-mark.svg" alt="PropertyAgent logo" />
+          </div>
           <h1 style={{ fontSize: "1.6rem", marginBottom: "0.25rem" }}>Welcome Back</h1>
           <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", margin: 0 }}>
-            Sign in to your AI Property Management Agent
+            Sign in to your PropertyAgent workspace
           </p>
         </div>
 
-        {loginError && <div className="alert-error">{loginError}</div>}
+        {loginError && <div className="alert-error" role="alert">{loginError}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="email">
-              Email Address
-            </label>
+            <label className="form-label" htmlFor="email">Email Address</label>
             <input
               type="email"
               name="Email"
               id="email"
-              placeholder="e.g. manager@estatepulse.com"
+              placeholder="e.g. manager@propertyagent.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
               disabled={isLoading}
+              autoComplete="email"
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="password">
-              Password
-            </label>
+            <label className="form-label" htmlFor="password">Password</label>
             <input
               type="password"
               name="password"
@@ -64,6 +63,7 @@ function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               disabled={isLoading}
+              autoComplete="current-password"
             />
           </div>
 
@@ -76,7 +76,7 @@ function LoginPage() {
             {isLoading ? "Signing in..." : "Sign In to Dashboard"}
           </button>
         </form>
-        <p>Dont have an account? <Link to="/register">Sign Up</Link></p>
+        <p>Don't have an account? <Link to="/register">Sign Up</Link></p>
       </div>
     </div>
   );
