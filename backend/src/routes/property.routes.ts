@@ -27,13 +27,6 @@ router.get(
     autihorize(ROLES.Tenant),
     propertyController.getMyAssignedProperties
 );
-router.post(
-    "/:id/tenants",
-    authenticate,
-    autihorize(ROLES.Admin, ROLES.Manager),
-    validate(assignTenantSchema),
-    propertyController.assignTenant
-);
 router.patch(
     "/:id/tenants/:tenantId/end",
     authenticate,
