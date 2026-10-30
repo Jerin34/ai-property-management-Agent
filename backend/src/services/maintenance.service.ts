@@ -128,6 +128,24 @@ export const updateMaintenanceStatus = async(maintenaceId:string,technicianId:st
    
     maintenance.status = status;
     await maintenance.save();
+
+    if (status === MAINTENANCE_STATUS.COMPLETED) {
+        try {
+            await createNotification({
+                recipient: maintenance.tenant.toString(),
+                maintenanceId: maintenance._id.toString(),
+                propertyId: maintenance.property.toString(),
+                type: "MAINTENANCE_COMPLETED",
+                severity: "LOW",
+                title: "Maintenance completed",
+                message: `The maintenance request "${maintenance.title}" has been marked as completed. Please review the work.`,
+                isRead: false,
+            });
+        } catch (error) {
+            console.error("Failed to notify tenant about completed maintenance:", error);
+        }
+    }
+
     return maintenance;
 }
 export const getManagerinsights = async(managerId:string)=>{
