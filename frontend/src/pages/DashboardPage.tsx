@@ -7,7 +7,7 @@ import CategroyBreakdown from "../components/categoryBreakdown";
 import TechnicianWorkLoad from "../components/TechnicianWorkload";
 import PropertyIssues from "../components/propertyIssues";
 import ResolutionMetric from "../components/ResolutionMetric";
-import { useAuth } from "../context/Authcontext";
+import { useAuth } from "../context/Authcontext"; 
 import TenantPropertyPage from "./TenantPropertyPage";
 import { Link } from "react-router-dom";
 import { getManagerPropertyRequests } from "../api/property.api";
@@ -70,7 +70,7 @@ function DashboardPage() {
         <span className="empty-state-icon">📊</span>
         <h3>No Dashboard Data Available</h3>
         <p>
-          {user?.role === "TENANT" || user?.role === "TECHNICIAN"
+          {user?.role === "TECHNICIAN"
             ? "Your account role accesses operational workflows via the navigation sidebar."
             : "No maintenance analytics data found in the system."}
         </p>
