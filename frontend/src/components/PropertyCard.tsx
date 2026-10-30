@@ -4,7 +4,6 @@ import type {Property } from "../types/property.types"
 import {
   activateProperty,
   deactivateProperty,
-  assignTenantToProperty,
 } from "../api/property.api";
 interface PropertyCardProps {
   property:Property,
@@ -14,26 +13,6 @@ function PropertyCard({ property,onStatusChange}:PropertyCardProps) {
   const navigate = useNavigate();
   const [isUpdating,setIsUpdating] = useState(false);
   const [error,setError] = useState("");
-  const [tenantEmail, setTenantEmail] = useState("");
-  const [isAssigningTenant, setIsAssigningTenant] = useState(false);
-  const [assignmentSuccess, setAssignmentSuccess] = useState("");
-  const handleAssignTenant = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!tenantEmail.trim()) return;
-    try {
-      setIsAssigningTenant(true);
-      setError("");
-      setAssignmentSuccess("");
-      await assignTenantToProperty(property._id, tenantEmail.trim());
-      setTenantEmail("");
-      setAssignmentSuccess("Tenant assigned successfully.");
-    } catch (err) {
-      const apiError = err as { response?: { data?: { message?: string } } };
-      setError(apiError.response?.data?.message ?? "Unable to assign tenant. Check the email and try again.");
-    } finally {
-      setIsAssigningTenant(false);
-    }
-  };
   const handleStatusToggle = async()=>{
     try{
       setIsUpdating(true);
@@ -124,7 +103,6 @@ function PropertyCard({ property,onStatusChange}:PropertyCardProps) {
           </p>
         )}
 
-        {assignmentSuccess && <p role="status" style={{ color: "var(--status-success-text)", fontSize: "0.85rem" }}>{assignmentSuccess}</p>}
         {error && (
           <p
             role="alert"
@@ -136,11 +114,6 @@ function PropertyCard({ property,onStatusChange}:PropertyCardProps) {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <form onSubmit={handleAssignTenant} style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <label htmlFor={`tenant-email-${property._id}`} style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Assign tenant by registered email</label>
-          <input id={`tenant-email-${property._id}`} type="email" value={tenantEmail} onChange={(event) => setTenantEmail(event.target.value)} placeholder="tenant@example.com" required disabled={isAssigningTenant || !property.isActive} />
-          <button type="submit" className="btn btn-outline btn-block" disabled={isAssigningTenant || !property.isActive || !tenantEmail.trim()}>{isAssigningTenant ? "Assigning..." : "Assign Tenant"}</button>
-        </form>
         <button
           type="button"
           className="btn btn-outline btn-block"
