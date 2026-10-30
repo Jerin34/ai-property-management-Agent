@@ -15,8 +15,7 @@ function LoginPage() {
     try {
       await login(email, password);
       navigate("/dashboard");
-    } catch (error) {
-      console.log(error);
+    } catch {
       setLoginError("Invalid email or password. Please try again.");
     }
   };
