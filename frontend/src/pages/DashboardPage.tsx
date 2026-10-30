@@ -8,6 +8,7 @@ import TechnicianWorkLoad from "../components/TechnicianWorkload";
 import PropertyIssues from "../components/propertyIssues";
 import ResolutionMetric from "../components/ResolutionMetric";
 import { useAuth } from "../context/Authcontext";
+import TenantPropertyPage from "./TenantPropertyPage";
 
 function DashboardPage() {
   const [analytics, setAnalytics] = useState<MaintenanceAnalytics | null>(null);
@@ -35,6 +36,10 @@ function DashboardPage() {
     };
     fetchAnalytics();
   }, [user]);
+
+  if (user?.role === "TENANT") {
+    return <TenantPropertyPage />;
+  }
 
   if (isLoading) {
     return (
