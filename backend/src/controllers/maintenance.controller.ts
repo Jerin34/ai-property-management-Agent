@@ -81,6 +81,15 @@ console.log(
             message?: string;
         };
 
+        if (err instanceof Error && err.message === "Tenant is not assigned to this property") {
+            res.status(403).json({
+                success: false,
+                code: "TENANT_PROPERTY_ACCESS_DENIED",
+                message: "You are not assigned to this property.",
+            });
+            return;
+        }
+
         if (err instanceof Error && err.message === "Property not found") {
             res.status(404).json({
                 success: false,
