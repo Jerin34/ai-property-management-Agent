@@ -8,6 +8,12 @@ import * as propertyController from '../controllers/property.controller.js'
 import { assignTenantSchema } from '../validator/tenant-property-assignment.validator.js'
 const router = Router()
 router.post("/",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(createPropertySchema),propertyController.create)
+router.get("/browse", authenticate, autihorize(ROLES.Tenant), stayRequestController.browseProperties);
+router.post("/:id/requests", authenticate, autihorize(ROLES.Tenant), stayRequestController.requestToStay);
+router.get("/requests/mine", authenticate, autihorize(ROLES.Tenant), stayRequestController.getMyRequests);
+router.get("/requests/manager", authenticate, autihorize(ROLES.Admin, ROLES.Manager), stayRequestController.getRequestsForManager);
+router.patch("/requests/:requestId", authenticate, autihorize(ROLES.Admin, ROLES.Manager), stayRequestController.reviewRequest);
+
 router.get(
     "/available",
     authenticate,
