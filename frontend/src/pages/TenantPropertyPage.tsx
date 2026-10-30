@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   browseProperties,
   getMyPropertyRequests,
@@ -17,7 +17,7 @@ function TenantPropertyPage() {
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -35,9 +35,9 @@ function TenantPropertyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void load(); }, [load]);
 
   const handleRequest = async (propertyId: string) => {
     try {
