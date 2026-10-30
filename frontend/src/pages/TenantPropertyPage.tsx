@@ -3,6 +3,8 @@ import {
   browseProperties,
   getMyPropertyRequests,
   requestToStay,
+  getMyTenantAssignments,
+  type TenantPropertyAssignment,
   type BrowseProperty,
   type PropertyStayRequest,
 } from "../api/property.api";
@@ -10,6 +12,7 @@ import {
 function TenantPropertyPage() {
   const [properties, setProperties] = useState<BrowseProperty[]>([]);
   const [requests, setRequests] = useState<PropertyStayRequest[]>([]);
+  const [assignments, setAssignments] = useState<TenantPropertyAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
@@ -18,12 +21,14 @@ function TenantPropertyPage() {
     try {
       setLoading(true);
       setError("");
-      const [propertyData, requestData] = await Promise.all([
+      const [propertyData, requestData, assignmentData] = await Promise.all([
         browseProperties(),
         getMyPropertyRequests(),
+        getMyTenantAssignments(),
       ]);
       setProperties(propertyData);
       setRequests(requestData);
+      setAssignments(assignmentData.filter((assignment) => assignment.status === "ACTIVE"));
     } catch (err) {
       const e = err as { response?: { data?: { message?: string } } };
       setError(e.response?.data?.message ?? "Unable to load property information.");
@@ -51,7 +56,7 @@ function TenantPropertyPage() {
   if (loading) return <div className="loading-container"><div className="spinner" /><p>Loading your property...</p></div>;
 
   const activeRequest = requests.find((r) => r.status === "PENDING");
-  const approved = requests.find((r) => r.status === "APPROVED");
+  const assignedProperties = assignments.map((assignment) => assignment.property).filter((property): property is Exclude<TenantPropertyAssignment["property"], string> => typeof property !== "string");
 
   return (
     <div>
@@ -62,11 +67,10 @@ function TenantPropertyPage() {
         </div>
       </div>
       {error && <div className="alert-error" role="alert">{error}</div>}
-      {approved ? (
+      {assignedProperties.length > 0 ? (
         <div className="card">
           <span className="badge badge-completed">Approved · Your assigned property</span>
-          <h2>{typeof approved.property === "string" ? "Your property" : approved.property.name}</h2>
-          {typeof approved.property !== "string" && <p>{approved.property.address?.street}, {approved.property.address?.city}</p>}
+          {assignedProperties.map((property) => <div key={property._id}><h2>{property.name}</h2><p>{property.address?.street}, {property.address?.city}</p></div>)}
           <p className="page-header-subtitle">Your manager approved your stay. You can now submit maintenance requests for this property.</p>
         </div>
       ) : (
@@ -90,7 +94,7 @@ function TenantPropertyPage() {
                       {existing.status}
                     </span>
                   ) : (
-                    <button className="btn btn-primary" disabled={!!activeRequest || !!busyId} onClick={() => void handleRequest(property._id)}>
+                    <button className="btn btn-primary" disabled={!!activeRequest || assignments.length > 0 || !!busyId} onClick={() => void handleRequest(property._id)}>
                       {busyId === property._id ? "Sending..." : "Request to Stay"}
                     </button>
                   )}
