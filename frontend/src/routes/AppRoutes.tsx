@@ -20,17 +20,17 @@ import MaintenanceSchedulerPage from "../pages/MaintenanceSchedulePage.tsx";
 import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePage.tsx";
 import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
 
-import AdminRoleApprovalsPage from '../pages/AdminRoleApprovalsPage.tsx'
+import AdminRoleApprovalsPage from "../pages/AdminRoleApprovalsPage.tsx";
 import ApplyForManagerPage from "../pages/ApplyForManagerRolePage.tsx";
 import TenantPropertyPage from "../pages/TenantPropertyPage.tsx";
 import TenantRequestsPage from "../pages/TenantRequestsPage.tsx";
-
+import NotFoundPage from "../pages/NotFoundPage.tsx";
 
 function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
+        {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
@@ -38,6 +38,7 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Applayout />}>
             <Route path="/dashboard" element={<DashBoardPage />} />
+
             <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
               <Route path="/analytics" element={<DashBoardPage />} />
               <Route path="/maintenance/sla" element={<MaintenanceSLAPage />} />
@@ -46,21 +47,28 @@ function AppRoutes() {
                 element={<MaintenanceCostAnalyticsPage />}
               />
             </Route>
+
             <Route element={<RoleRoute allowedRoles={["MANAGER"]} />}>
-            <Route path="/properties/create" element={<CreatePropertyPage/>} />
+              <Route
+                path="/properties/create"
+                element={<CreatePropertyPage />}
+              />
               <Route path="/tenant-requests" element={<TenantRequestsPage />} />
             </Route>
 
-            {/* Maintenance is accessible to authenticated roles */}
             <Route path="/maintenance" element={<MaintenancePage />} />
             <Route path="/notification" element={<NotificationPage />} />
+
             <Route element={<RoleRoute allowedRoles={["TENANT"]} />}>
               <Route
                 path="/maintenance/create"
                 element={<CreateMaintenancePage />}
               />
               <Route path="/my-property" element={<TenantPropertyPage />} />
-              <Route path="/apply-for-manager" element={<ApplyForManagerPage />} />
+              <Route
+                path="/apply-for-manager"
+                element={<ApplyForManagerPage />}
+              />
             </Route>
 
             <Route
@@ -68,7 +76,6 @@ function AppRoutes() {
               element={<MaintenanceDetailsPage />}
             />
 
-            {/* {Technician} */}
             <Route element={<RoleRoute allowedRoles={["TECHNICIAN"]} />}>
               <Route
                 path="/technician/maintenance"
@@ -76,31 +83,33 @@ function AppRoutes() {
               />
             </Route>
 
-<Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
-  <Route
-    path="/admin/role-approvals"
-    element={<AdminRoleApprovalsPage />}
-  />
-</Route>
-            {/* Admin / Manager only */}
+            <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+              <Route
+                path="/admin/role-approvals"
+                element={<AdminRoleApprovalsPage />}
+              />
+            </Route>
+
             <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
-
               <Route path="/properties" element={<PropertiesPage />} />
-
               <Route
                 path="/maintenance/schedules"
                 element={<MaintenanceSchedulerPage />}
               />
-
               <Route
                 path="/maintenance/schedules/create"
                 element={<CreateMaintenanceSchedulePage />}
               />
-
-              <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+              <Route
+                path="/properties/:id"
+                element={<PropertyDetailsPage />}
+              />
             </Route>
           </Route>
         </Route>
+
+        {/* Keep the fallback outside protected routes so unknown URLs render 404. */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
