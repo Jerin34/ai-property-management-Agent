@@ -103,7 +103,11 @@ export const getAvailablePropertiesList = async (
     res: Response
 ): Promise<void> => {
     try {
-        const properties = await getAvailableProperties();
+        if (!req.user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
+        const properties = await getAvailableProperties(req.user.userId);
 
         res.status(200).json({
             success: true,
