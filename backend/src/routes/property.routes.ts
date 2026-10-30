@@ -5,6 +5,7 @@ import {autihorize} from '../middleware/role.middleware.js'
 import {ROLES} from '../constants/roles.js'
 import {createPropertySchema,updatePropertySchema} from  '../validator/property.validator.js'
 import * as propertyController from '../controllers/property.controller.js'
+import { assignTenantSchema } from '../validator/tenant-property-assignment.validator.js'
 const router = Router()
 router.post("/",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(createPropertySchema),propertyController.create)
 router.get(
@@ -14,6 +15,25 @@ router.get(
     propertyController.getAvailablePropertiesList
 );
 router.get("/my",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.getProperties)
+router.get(
+    "/tenants/my",
+    authenticate,
+    autihorize(ROLES.Tenant),
+    propertyController.getMyAssignedProperties
+);
+router.post(
+    "/:id/tenants",
+    authenticate,
+    autihorize(ROLES.Admin, ROLES.Manager),
+    validate(assignTenantSchema),
+    propertyController.assignTenant
+);
+router.patch(
+    "/:id/tenants/:tenantId/end",
+    authenticate,
+    autihorize(ROLES.Admin, ROLES.Manager),
+    propertyController.endTenantAssignment
+);
 router.patch("/:id/deactivate",authenticate,autihorize(ROLES.Admin,ROLES.Manager),propertyController.deactivateProperty)
 router.patch(
     "/:id/activate",
