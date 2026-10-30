@@ -7,6 +7,7 @@ import uploadImage from '../services/upload.service.js'
 import { detectRecurringMaintenace } from "../services/recurring.service.js";
 import Property from '../models/property.models.js'
 import Maintenance from '../models/maintenance.model.js'
+import TenantPropertyAssignment from '../models/tenant-property-assignment.model.js'
 
 
 export const createMaintenance = async (
@@ -24,9 +25,7 @@ export const createMaintenance = async (
             return;
         }
 
-        // Reject unknown or inactive properties before uploading photos or calling Gemini.
-        // Tenant-to-property authorization is deferred until the app has a tenant-property
-        // assignment model; selecting a property in the UI is not proof of ownership.
+        // Verify the tenant's active property assignment before uploading photos or calling AI.
         const selectedProperty = await Property.findById(req.body.propertyId)
             .select("_id isActive");
 
@@ -35,6 +34,20 @@ export const createMaintenance = async (
                 success: false,
                 code: "PROPERTY_NOT_AVAILABLE",
                 message: "This property is not available for maintenance requests.",
+            });
+            return;
+        }
+
+        const activeAssignment = await TenantPropertyAssignment.exists({
+            tenant: user.userId,
+            property: req.body.propertyId,
+            status: "ACTIVE",
+        });
+        if (!activeAssignment) {
+            res.status(403).json({
+                success: false,
+                code: "TENANT_PROPERTY_ACCESS_DENIED",
+                message: "You are not assigned to this property.",
             });
             return;
         }
@@ -80,6 +93,15 @@ console.log(
             status?: number;
             message?: string;
         };
+
+        if (err instanceof Error && err.message === "Tenant is not assigned to this property") {
+            res.status(403).json({
+                success: false,
+                code: "TENANT_PROPERTY_ACCESS_DENIED",
+                message: "You are not assigned to this property.",
+            });
+            return;
+        }
 
         if (err instanceof Error && err.message === "Property not found") {
             res.status(404).json({

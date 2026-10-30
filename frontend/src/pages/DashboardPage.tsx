@@ -8,12 +8,16 @@ import TechnicianWorkLoad from "../components/TechnicianWorkload";
 import PropertyIssues from "../components/propertyIssues";
 import ResolutionMetric from "../components/ResolutionMetric";
 import { useAuth } from "../context/Authcontext";
+import TenantPropertyPage from "./TenantPropertyPage";
+import { Link } from "react-router-dom";
+import { getManagerPropertyRequests } from "../api/property.api";
 
 function DashboardPage() {
   const [analytics, setAnalytics] = useState<MaintenanceAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const [pendingTenantRequestCount, setPendingTenantRequestCount] = useState(0);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -35,6 +39,17 @@ function DashboardPage() {
     };
     fetchAnalytics();
   }, [user]);
+
+  useEffect(() => {
+    if (user?.role !== "MANAGER") return;
+    getManagerPropertyRequests()
+      .then((requests) => setPendingTenantRequestCount(requests.length))
+      .catch((requestError) => console.error("Failed to load tenant request count:", requestError));
+  }, [user]);
+
+  if (user?.role === "TENANT") {
+    return <TenantPropertyPage />;
+  }
 
   if (isLoading) {
     return (
@@ -73,6 +88,16 @@ function DashboardPage() {
           </p>
         </div>
       </div>
+
+      {user?.role === "MANAGER" && pendingTenantRequestCount > 0 && (
+        <div className="card" style={{ marginBottom: "1.25rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+          <div>
+            <h3 style={{ margin: 0 }}>Tenant stay requests</h3>
+            <p className="page-header-subtitle" style={{ marginBottom: 0 }}>{pendingTenantRequestCount} tenant request(s) are waiting for your approval.</p>
+          </div>
+          <Link className="btn btn-primary" to="/tenant-requests">Review Requests</Link>
+        </div>
+      )}
 
       {/* KPI Overview Grid */}
       <div className="kpi-grid">

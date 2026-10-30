@@ -10,13 +10,24 @@ import { MAINTENANCE_STATUS } from "../constants/maintenance.js";
 import type {MaintenanceAiResult} from '../types/ai.types.js'
 import { gnerateManagerInsights } from './ai.service.js'
 import { createNotification } from './notification.services.js'
+import TenantPropertyAssignment from "../models/tenant-property-assignment.model.js";
 
 export const createMaintenanceReq = async(data:createMaintenanceInput,tenantId:string) =>{
  
     const property = await Property.findById(data.propertyId)
-    if(!property){
+    if(!property || !property.isActive){
         throw new Error("Property not found")
     }
+
+    const activeAssignment = await TenantPropertyAssignment.findOne({
+        tenant: tenantId,
+        property: data.propertyId,
+        status: "ACTIVE",
+    });
+    if (!activeAssignment) {
+        throw new Error("Tenant is not assigned to this property");
+    }
+
        let classification:MaintenanceAiResult;
        try{
         classification = await analyseMaintenaceRequest(data.description);
@@ -115,8 +126,27 @@ export const updateMaintenanceStatus = async(maintenaceId:string,technicianId:st
     throw new Error("You are not assigned to this maintenance request");
 }
    
+    const wasAlreadyCompleted = maintenance.status === MAINTENANCE_STATUS.COMPLETED;
     maintenance.status = status;
     await maintenance.save();
+
+    if (status === MAINTENANCE_STATUS.COMPLETED && !wasAlreadyCompleted) {
+        try {
+            await createNotification({
+                recipient: maintenance.tenant.toString(),
+                maintenanceId: maintenance._id.toString(),
+                propertyId: maintenance.property.toString(),
+                type: "MAINTENANCE_COMPLETED",
+                severity: "LOW",
+                title: "Maintenance completed",
+                message: `The maintenance request "${maintenance.title}" has been marked as completed. Please review the work.`,
+                isRead: false,
+            });
+        } catch (error) {
+            console.error("Failed to notify tenant about completed maintenance:", error);
+        }
+    }
+
     return maintenance;
 }
 export const getManagerinsights = async(managerId:string)=>{

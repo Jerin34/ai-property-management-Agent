@@ -7,6 +7,16 @@ export const NavigationItems : NavigationItem[] = [
         allowedRoles:["ADMIN","MANAGER","TECHNICIAN","TENANT"]
     },
     {
+        label:"Tenant Requests",
+        path:"/tenant-requests",
+        allowedRoles:["MANAGER"]
+    },
+    {
+        label:"My Property",
+        path:"/my-property",
+        allowedRoles:["TENANT"]
+    },
+    {
         label:"Properties",
         path:"/properties",
         allowedRoles:["ADMIN","MANAGER"]

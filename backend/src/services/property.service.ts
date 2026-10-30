@@ -1,4 +1,5 @@
 import Property from "../models/property.models.js";
+import TenantPropertyAssignment from "../models/tenant-property-assignment.model.js";
 import { createPropertyInput,updatePropertyInput } from "../validator/property.validator.js";
 
 export const createProperty = async(data:createPropertyInput, managerId:string) =>{
@@ -11,8 +12,18 @@ export const getMyProperties = async(managerId:string) =>{
     })
     return properties
 }
-export const getAvailableProperties = async () => {
-    return await Property.find({ isActive: true })
+export const getAvailableProperties = async (tenantId: string) => {
+    const assignments = await TenantPropertyAssignment.find({
+        tenant: tenantId,
+        status: "ACTIVE",
+    }).select("property");
+
+    const propertyIds = assignments.map((assignment) => assignment.property);
+
+    return Property.find({
+        _id: { $in: propertyIds },
+        isActive: true,
+    })
         .select("_id name address")
         .sort({ name: 1 });
 };

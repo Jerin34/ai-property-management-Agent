@@ -13,7 +13,7 @@ function PropertyCard({ property,onStatusChange}:PropertyCardProps) {
   const navigate = useNavigate();
   const [isUpdating,setIsUpdating] = useState(false);
   const [error,setError] = useState("");
-  const handleStatusToggle = async() =>{
+  const handleStatusToggle = async()=>{
     try{
       setIsUpdating(true);
       setError("");

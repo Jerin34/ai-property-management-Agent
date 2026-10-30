@@ -3,6 +3,11 @@ import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdServi
 import { PropertyHealthService } from '../services/property-health.services.js'
 import {ROLES} from '../constants/roles.js'
 import { ManagerCopilotService } from '../services/manager-copilot.services.js';
+import {
+    assignTenantToProperty,
+    getTenantAssignedProperties,
+    endTenantPropertyAssignment,
+} from '../services/tenant-property-assignment.service.js';
 export const create  =  async(req:Request,res:Response): Promise<void>=>{
     try{ 
         if(!req.user){
@@ -98,7 +103,11 @@ export const getAvailablePropertiesList = async (
     res: Response
 ): Promise<void> => {
     try {
-        const properties = await getAvailableProperties();
+        if (!req.user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
+        const properties = await getAvailableProperties(req.user.userId);
 
         res.status(200).json({
             success: true,
@@ -288,3 +297,104 @@ export const ManagerCopilot = async(req:Request,res:Response):Promise<void> =>{
         })  
     }
 }
+
+export const assignTenant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
+
+        const propertyId = String(req.params.id);
+        const property = await getPropertyByIdService(propertyId);
+
+        if (user.role !== ROLES.Admin && property.manager.toString() !== user.userId) {
+            res.status(403).json({ success: false, message: "You cannot manage tenants for this property" });
+            return;
+        }
+
+        const assignment = await assignTenantToProperty(
+            propertyId,
+            req.body.tenantEmail,
+            user.userId
+        );
+
+        res.status(201).json({
+            success: true,
+            message: "Tenant assigned to property successfully",
+            data: assignment,
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "";
+        if (message === "Property not found") {
+            res.status(404).json({ success: false, message });
+            return;
+        }
+        if (
+            message === "Property not found or inactive" ||
+            message === "An active tenant account is required"
+        ) {
+            res.status(400).json({ success: false, message });
+            return;
+        }
+        if (message === "Tenant is already assigned to this property") {
+            res.status(409).json({ success: false, message });
+            return;
+        }
+        console.error("Assign tenant failed:", error);
+        res.status(500).json({ success: false, message: "Failed to assign tenant" });
+    }
+};
+
+export const getMyAssignedProperties = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
+        const assignments = await getTenantAssignedProperties(req.user.userId);
+        res.status(200).json({
+            success: true,
+            message: "Assigned properties fetched successfully",
+            data: assignments,
+        });
+    } catch (error) {
+        console.error("Fetch tenant properties failed:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch assigned properties" });
+    }
+};
+
+export const endTenantAssignment = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
+
+        const propertyId = String(req.params.id);
+        const tenantId = String(req.params.tenantId);
+        const property = await getPropertyByIdService(propertyId);
+
+        if (user.role !== ROLES.Admin && property.manager.toString() !== user.userId) {
+            res.status(403).json({ success: false, message: "You cannot manage tenants for this property" });
+            return;
+        }
+
+        const assignment = await endTenantPropertyAssignment(propertyId, tenantId);
+        res.status(200).json({
+            success: true,
+            message: "Tenant property assignment ended successfully",
+            data: assignment,
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "";
+        if (message === "Property not found" || message === "Active tenant assignment not found") {
+            res.status(404).json({ success: false, message });
+            return;
+        }
+        console.error("End tenant assignment failed:", error);
+        res.status(500).json({ success: false, message: "Failed to end tenant assignment" });
+    }
+};
