@@ -9,7 +9,7 @@ export const NavigationItems : NavigationItem[] = [
     {
         label:"Tenant Requests",
         path:"/tenant-requests",
-        allowedRoles:["ADMIN","MANAGER"]
+        allowedRoles:["MANAGER"]
     },
     {
         label:"My Property",
