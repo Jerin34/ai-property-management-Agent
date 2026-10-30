@@ -22,6 +22,8 @@ import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
 
 import AdminRoleApprovalsPage from '../pages/AdminRoleApprovalsPage.tsx'
 import ApplyForManagerPage from "../pages/ApplyForManagerRolePage.tsx";
+import TenantPropertyPage from "../pages/TenantPropertyPage.tsx";
+import TenantRequestsPage from "../pages/TenantRequestsPage.tsx";
 
 
 function AppRoutes() {
@@ -46,6 +48,7 @@ function AppRoutes() {
             </Route>
             <Route element={<RoleRoute allowedRoles={["MANAGER"]} />}>
             <Route path="/properties/create" element={<CreatePropertyPage/>} />
+              <Route path="/tenant-requests" element={<TenantRequestsPage />} />
             </Route>
 
             {/* Maintenance is accessible to authenticated roles */}
@@ -56,6 +59,7 @@ function AppRoutes() {
                 path="/maintenance/create"
                 element={<CreateMaintenancePage />}
               />
+              <Route path="/my-property" element={<TenantPropertyPage />} />
               <Route path="/apply-for-manager" element={<ApplyForManagerPage />} />
             </Route>
 
