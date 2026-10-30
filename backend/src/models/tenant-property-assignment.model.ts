@@ -58,16 +58,16 @@ tenantPropertyAssignmentSchema.index(
     }
 );
 
-const TenantPropertyAssignment = mongoose.model<ITenantPropertyAssignment>(
-    "TenantPropertyAssignment",
-    tenantPropertyAssignmentSchema
-);
-
-export default TenantPropertyAssignment;
-
 
 // A tenant can have only one active residential property at a time.
 tenantPropertyAssignmentSchema.index(
     { tenant: 1 },
     { unique: true, partialFilterExpression: { status: "ACTIVE" } }
 );
+
+const TenantPropertyAssignment = mongoose.model<ITenantPropertyAssignment>(
+    "TenantPropertyAssignment",
+    tenantPropertyAssignmentSchema
+);
+
+export default TenantPropertyAssignment;
