@@ -5,12 +5,12 @@ import { ROLES } from "../constants/roles.js";
 
 export const assignTenantToProperty = async (
     propertyId: string,
-    tenantId: string,
+    tenantEmail: string,
     assignedBy: string
 ) => {
     const [property, tenant] = await Promise.all([
         Property.findById(propertyId),
-        User.findById(tenantId),
+        User.findOne({ email: tenantEmail.trim().toLowerCase() }),
     ]);
 
     if (!property || !property.isActive) {
@@ -22,7 +22,7 @@ export const assignTenantToProperty = async (
 
     const existingAssignment = await TenantPropertyAssignment.findOne({
         property: propertyId,
-        tenant: tenantId,
+        tenant: tenant._id,
         status: "ACTIVE",
     });
 
@@ -32,7 +32,7 @@ export const assignTenantToProperty = async (
 
     return TenantPropertyAssignment.create({
         property: propertyId,
-        tenant: tenantId,
+        tenant: tenant._id,
         assignedBy,
         status: "ACTIVE",
         startDate: new Date(),
