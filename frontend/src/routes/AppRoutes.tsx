@@ -48,11 +48,14 @@ function AppRoutes() {
               />
             </Route>
 
-            <Route element={<RoleRoute allowedRoles={["MANAGER"]} />}>
+            <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
               <Route
                 path="/properties/create"
                 element={<CreatePropertyPage />}
               />
+            </Route>
+
+            <Route element={<RoleRoute allowedRoles={["MANAGER"]} />}>
               <Route path="/tenant-requests" element={<TenantRequestsPage />} />
             </Route>
 
