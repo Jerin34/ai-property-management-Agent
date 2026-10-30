@@ -94,3 +94,44 @@ export const assignTenantToProperty = async (propertyId: string, tenantEmail: st
     );
     return response.data;
 };
+
+export interface BrowseProperty extends AvailableProperty {
+    description?: string;
+    manager?: { _id: string; name?: string; email?: string } | string;
+}
+export interface PropertyStayRequest {
+    _id: string;
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    createdAt: string;
+    property: { _id: string; name: string; address?: { street?: string; city?: string } } | string;
+    tenant: { _id: string; name?: string; email?: string } | string;
+}
+export interface TenantPropertyAssignment {
+    _id: string;
+    status: "ACTIVE" | "ENDED";
+    property: { _id: string; name: string; address?: { street?: string; city?: string } } | string;
+}
+export const browseProperties = async (): Promise<BrowseProperty[]> => {
+    const response = await apiClient.get<{ success: boolean; data: BrowseProperty[] }>("/properties/browse");
+    return response.data.data;
+};
+export const requestToStay = async (propertyId: string) => {
+    const response = await apiClient.post("/properties/" + propertyId + "/requests");
+    return response.data;
+};
+export const getMyPropertyRequests = async (): Promise<PropertyStayRequest[]> => {
+    const response = await apiClient.get<{ success: boolean; data: PropertyStayRequest[] }>("/properties/requests/mine");
+    return response.data.data;
+};
+export const getManagerPropertyRequests = async (): Promise<PropertyStayRequest[]> => {
+    const response = await apiClient.get<{ success: boolean; data: PropertyStayRequest[] }>("/properties/requests/manager");
+    return response.data.data;
+};
+export const reviewPropertyRequest = async (requestId: string, decision: "APPROVE" | "REJECT") => {
+    const response = await apiClient.patch("/properties/requests/" + requestId, { decision });
+    return response.data;
+};
+export const getMyTenantAssignments = async (): Promise<TenantPropertyAssignment[]> => {
+    const response = await apiClient.get<{ success: boolean; data: TenantPropertyAssignment[] }>("/properties/tenants/my");
+    return response.data.data;
+};
