@@ -126,10 +126,11 @@ export const updateMaintenanceStatus = async(maintenaceId:string,technicianId:st
     throw new Error("You are not assigned to this maintenance request");
 }
    
+    const wasAlreadyCompleted = maintenance.status === MAINTENANCE_STATUS.COMPLETED;
     maintenance.status = status;
     await maintenance.save();
 
-    if (status === MAINTENANCE_STATUS.COMPLETED) {
+    if (status === MAINTENANCE_STATUS.COMPLETED && !wasAlreadyCompleted) {
         try {
             await createNotification({
                 recipient: maintenance.tenant.toString(),
