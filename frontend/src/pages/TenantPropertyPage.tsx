@@ -89,7 +89,7 @@ function TenantPropertyPage() {
                   <h3>{property.name}</h3>
                   <p>{property.address.street}, {property.address.city}</p>
                   {property.description && <p>{property.description}</p>}
-                  {existing ? (
+                  {existing && existing.status !== "REJECTED" ? (
                     <span className={existing.status === "APPROVED" ? "badge badge-completed" : existing.status === "REJECTED" ? "badge badge-neutral" : "badge badge-warning"}>
                       {existing.status}
                     </span>
