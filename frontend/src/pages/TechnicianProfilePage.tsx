@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import axios from "axios";
 import {
   getTechnicianProfile,
@@ -79,7 +79,7 @@ function TechnicianProfilePage() {
     setAreaInput("");
   };
 
-  const save = async (event: React.FormEvent<HTMLFormElement>) => {
+  const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSaving(true);
     setError("");
