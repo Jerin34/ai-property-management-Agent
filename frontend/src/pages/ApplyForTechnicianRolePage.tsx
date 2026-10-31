@@ -33,7 +33,7 @@ function ApplyForTechnicianRolePage() {
     setError("");
     try {
       await applyForTechnicianRole();
-      await loadStatus();
+      setStatus("PENDING");
     } catch (err) {
       const message = axios.isAxiosError(err)
         ? err.response?.data?.message
