@@ -20,6 +20,7 @@ import MaintenanceSchedulerPage from "../pages/MaintenanceSchedulePage.tsx";
 import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePage.tsx";
 import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
 
+
 import AdminRoleApprovalsPage from "../pages/AdminRoleApprovalsPage.tsx";
 import ApplyForTechnicianRolePage from "../pages/ApplyForTechnicianRolePage.tsx";
 import AdminTechnicianRoleApprovalsPage from "../pages/AdminTechnicianRoleApprovalsPage.tsx";
@@ -75,6 +76,7 @@ function AppRoutes() {
                 path="/apply-for-manager"
                 element={<ApplyForManagerPage />}
               />
+              <Route path="apply-for-technician" element={<ApplyForTechnicianRolePage />} />
             </Route>
 
             <Route

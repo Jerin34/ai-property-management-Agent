@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import axios from "axios";
 import {
   applyForTechnicianRole,
@@ -6,13 +6,15 @@ import {
   type TechnicianApplicationStatus,
 } from "../api/technician.api";
 
+
 function ApplyForTechnicianRolePage() {
   const [status, setStatus] = useState<TechnicianApplicationStatus>("NOT_REQUESTED");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const loadStatus = useCallback(async () => {
+useEffect(() => {
+  const loadStatus = async () => {
     try {
       const result = await getTechnicianApplicationStatus();
       setStatus(result.status);
@@ -22,12 +24,10 @@ function ApplyForTechnicianRolePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    void loadStatus();
-  }, [loadStatus]);
-
+  void loadStatus();
+}, []);
   const handleApply = async () => {
     setSubmitting(true);
     setError("");

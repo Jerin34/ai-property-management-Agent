@@ -969,3 +969,21 @@ textarea:disabled {
     grid-template-columns: 1fr;
   }
 }
+/* Hide mobile logout on desktop */
+.mobile-logout {
+  display: none;
+}
+
+/* Show logout on mobile */
+@media (max-width: 768px) {
+  .mobile-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .topbar-user {
+    gap: 0.5rem;
+  }
+}
