@@ -12,6 +12,7 @@ import {
     rejectTechnicianRole as rejectTechnicianRoleService,
     getTechnicianProfile as getTechnicianProfileService,
     updateTechnicianProfile as updateTechnicianProfileService,
+    getTechnicianApplicationStatus,
 } from '../services/user.services.js';
 import type { UpdateTechnicianProfileInput } from '../validator/user.validator.js';
 export const updateRole = async(req:Request,res:Response):Promise<void> =>{
@@ -387,5 +388,16 @@ export const updateTechnicianProfile = async (req: Request, res: Response): Prom
         }
         console.error("Failed to update Technician profile:", err);
         res.status(500).json({ success: false, message: "Failed to update Technician profile" });
+    }
+};
+
+
+export const getMyTechnicianApplicationStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const status = await getTechnicianApplicationStatus(req.user!.userId);
+        res.status(200).json({ success: true, data: status });
+    } catch (err) {
+        console.error("Failed to fetch Technician application status:", err);
+        res.status(500).json({ success: false, message: "Failed to fetch application status" });
     }
 };
