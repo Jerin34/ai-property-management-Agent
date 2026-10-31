@@ -65,15 +65,24 @@ function DashboardPage() {
   }
 
   if (!analytics) {
+    if (user?.role === "TECHNICIAN") {
+      return (
+        <div className="empty-state">
+          <span className="empty-state-icon">🛠️</span>
+          <h3>Technician Workspace</h3>
+          <p>Complete and maintain your Technician profile so Managers can match maintenance jobs to your skills and availability.</p>
+          <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem", flexWrap: "wrap", marginTop: "1rem" }}>
+            <Link className="btn btn-primary" to="/technician/profile">Complete Technician Profile</Link>
+            <Link className="btn btn-secondary" to="/technician/maintenance">View My Assignments</Link>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="empty-state">
         <span className="empty-state-icon">📊</span>
         <h3>No Dashboard Data Available</h3>
-        <p>
-          { user?.role === "TECHNICIAN"
-            ? "Your account role accesses operational workflows via the navigation sidebar."
-            : "No maintenance analytics data found in the system."}
-        </p>
+        <p>No maintenance analytics data found in the system.</p>
       </div>
     );
   }
