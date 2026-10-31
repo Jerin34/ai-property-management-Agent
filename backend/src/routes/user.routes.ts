@@ -13,6 +13,12 @@ import * as userController from '../controllers/user.controller.js';
 
 const router = Router();
 
+router.get(
+    "/technician-role-application/status",
+    authenticate,
+    autihorize(ROLES.Tenant),
+    userController.getMyTechnicianApplicationStatus
+);
 router.post(
     "/technician-role-application",
     authenticate,
