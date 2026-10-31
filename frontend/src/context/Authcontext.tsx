@@ -1,6 +1,5 @@
+
 import {
-  createContext,
-  useContext,
   useState,
   useEffect,
   type ReactNode,
@@ -9,16 +8,7 @@ import {
 import { login as loginApi, getCurrentUser } from "../api/auth.api";
 import type { AuthUser } from "../types/auth.types";
 import { storage } from "../utils/storage";
-
-interface AuthContextType {
-  user: AuthUser | null;
-  token: string | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "./auth-context";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -51,7 +41,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     };
 
-    restoreSession();
+    void restoreSession();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -64,8 +54,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       storage.setToken(token);
       setToken(token);
       setUser(user);
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -84,12 +72,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
-
-  return context;
-};

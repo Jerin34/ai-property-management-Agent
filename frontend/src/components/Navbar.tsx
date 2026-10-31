@@ -1,4 +1,4 @@
-import { useAuth } from "../context/Authcontext";
+import { useAuth } from "../context/useAuth";
 
 function Navbar() {
   const { user } = useAuth();

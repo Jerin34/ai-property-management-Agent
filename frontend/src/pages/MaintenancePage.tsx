@@ -3,8 +3,7 @@ import { getMaintenanceRequests } from "../api/maintenance.api";
 import type { Maintenance } from "../types/maintenance.types";
 import { useNavigate } from "react-router-dom";
 import MaintenanceCard from "../components/MaintenanceCards";
-import { useAuth } from "../context/Authcontext";
-
+import { useAuth } from "../context/useAuth";
 function MaintenancePage() {
   const { user } = useAuth();
   const navigate = useNavigate();

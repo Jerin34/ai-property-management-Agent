@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { NavigationItems } from "../routes/Navigation";
-import { useAuth } from "../context/Authcontext";
+import { useAuth } from "../context/useAuth";
 
 const navigationIcons: Record<string, string> = {
   Dashboard: "⌂",

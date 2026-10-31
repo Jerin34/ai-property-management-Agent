@@ -14,7 +14,7 @@ import type { TechnicianRecommendation } from "../types/technician.types";
 import TechnicianRecommendations from "../components/TechnicianRecommendation";
 import MaintenancesUpdates from "../components/MaintenanceUpdates";
 import AddMaintenanceUpdate from "../components/AddMaintenanceUpdates";
-import { useAuth } from "../context/Authcontext";
+import { useAuth } from "../context/useAuth";
 import type { RecurringMaintenance as RecurringMaintenanceData } from "../types/recurring-maintenance.types";
 import RecurringMaintenance from "../components/RecurringMaintenaceCard";
 import MaintenanceCostForm from "../components/MaintenanceCostForm";

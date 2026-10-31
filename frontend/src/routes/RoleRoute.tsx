@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../context/Authcontext.tsx";
+import { useAuth } from "../context/useAuth";
 import type { UserRole } from "../types/auth.types";
 interface allowedRouteProps {
     allowedRoles:UserRole[]

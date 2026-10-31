@@ -3,7 +3,7 @@ import {
   getNotifications,
   markNotificationsAsRead,
 } from "../api/notification.api";
-import { useAuth } from "../context/Authcontext";
+import { useAuth } from "../context/useAuth";
 import type { Notification } from "../types/notification.types";
 import NotificationPreferences from "../components/NotificationPreferences";
 
