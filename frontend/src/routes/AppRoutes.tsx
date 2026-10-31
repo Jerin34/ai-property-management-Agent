@@ -21,6 +21,9 @@ import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePag
 import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
 
 import AdminRoleApprovalsPage from "../pages/AdminRoleApprovalsPage.tsx";
+import ApplyForTechnicianRolePage from "../pages/ApplyForTechnicianRolePage.tsx";
+import AdminTechnicianRoleApprovalsPage from "../pages/AdminTechnicianRoleApprovalsPage.tsx";
+import TechnicianProfilePage from "../pages/TechnicianProfilePage.tsx";
 import ApplyForManagerPage from "../pages/ApplyForManagerRolePage.tsx";
 import TenantPropertyPage from "../pages/TenantPropertyPage.tsx";
 import TenantRequestsPage from "../pages/TenantRequestsPage.tsx";
@@ -84,12 +87,17 @@ function AppRoutes() {
                 path="/technician/maintenance"
                 element={<TechnicianMaintenancePage />}
               />
+              <Route path="/technician/profile" element={<TechnicianProfilePage />} />
             </Route>
 
             <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
               <Route
                 path="/admin/role-approvals"
                 element={<AdminRoleApprovalsPage />}
+              />
+              <Route
+                path="/admin/technician-role-approvals"
+                element={<AdminTechnicianRoleApprovalsPage />}
               />
             </Route>
 
