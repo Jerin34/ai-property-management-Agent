@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import getMaintenaceAnalytics from "../api/analytics.api";
 import type { MaintenanceAnalytics } from "../types/analytics.types";
@@ -124,49 +123,51 @@ function DashboardPage() {
     }
 
     return (
-      <div className="empty-state">
-        <span className="empty-state-icon">🛠️</span>
+      <section className="technician-dashboard">
+        <div className="dashboard-welcome technician-welcome">
+          <div>
+            <span className="dashboard-eyebrow">YOUR WORKSPACE</span>
+            <h1>Welcome back, {user?.name?.split(" ")[0] || "Technician"}</h1>
+            <p>Keep track of your assigned maintenance work and profile readiness.</p>
+          </div>
+          <div className="dashboard-welcome-mark" aria-hidden="true">✦</div>
+        </div>
 
-        {technicianProfileCompleted ? (
-          <>
-            <h3>Technician Workspace</h3>
-            <p>
-              Your Technician profile is complete. You are eligible
-              to receive maintenance assignments.
-            </p>
-          </>
-        ) : (
-          <>
-            <h3>Complete Your Technician Profile</h3>
-            <p>
-              Complete your skills, experience, service areas and
-              availability to become eligible for maintenance assignments.
-            </p>
-
-            <Link
-              className="btn btn-primary"
-              to="/technician/profile"
-            >
-              Complete Technician Profile
+        <div className="technician-status-card">
+          <div className="technician-status-icon" aria-hidden="true">🛠️</div>
+          <div className="technician-status-copy">
+            {technicianProfileCompleted ? (
+              <>
+                <span className="dashboard-status-label is-ready">PROFILE READY</span>
+                <h2>Your technician profile is complete</h2>
+                <p>You are eligible to receive maintenance assignments.</p>
+              </>
+            ) : (
+              <>
+                <span className="dashboard-status-label is-pending">ACTION REQUIRED</span>
+                <h2>Complete your technician profile</h2>
+                <p>Add your skills, experience, service areas and availability to become eligible for assignments.</p>
+              </>
+            )}
+          </div>
+          {!technicianProfileCompleted && (
+            <Link className="btn btn-primary" to="/technician/profile">
+              Complete profile
             </Link>
-          </>
-        )}
+          )}
+        </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "1rem",
-          }}
-        >
-          <Link
-            className="btn btn-secondary"
-            to="/technician/maintenance"
-          >
-            View My Assignments
+        <div className="technician-quick-link">
+          <div>
+            <span className="dashboard-eyebrow">WORK QUEUE</span>
+            <h3>Ready to manage your assignments?</h3>
+            <p>Open your maintenance workspace to review and update assigned requests.</p>
+          </div>
+          <Link className="btn btn-primary" to="/technician/maintenance">
+            View my assignments <span aria-hidden="true">→</span>
           </Link>
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -195,52 +196,53 @@ function DashboardPage() {
   }
 
   return (
-    <div>
-      <div className="page-header">
-        <div className="page-header-left">
-          <h1 className="page-header-title">
-            Operations Dashboard
-          </h1>
-
-          <p className="page-header-subtitle">
-            Real-time portfolio maintenance performance, technician
-            workload, and resolution metrics.
-          </p>
+    <section className="operations-dashboard">
+      <header className="dashboard-welcome">
+        <div className="dashboard-welcome-copy">
+          <span className="dashboard-eyebrow">PROPERTY OPERATIONS</span>
+          <h1>Good to see you, {user?.name?.split(" ")[0] || "there"}.</h1>
+          <p>Here’s what’s happening across your maintenance operations today.</p>
+          <div className="dashboard-welcome-meta">
+            <span className="dashboard-live-dot" />
+            Operations overview
+            <span className="dashboard-meta-divider">/</span>
+            {user?.role === "ADMIN" ? "Administrator" : "Manager"} view
+          </div>
         </div>
+        <div className="dashboard-welcome-actions">
+          <Link className="dashboard-button dashboard-button-light" to="/maintenance">
+            View requests <span aria-hidden="true">↗</span>
+          </Link>
+          <Link className="dashboard-button dashboard-button-primary" to="/properties">
+            Browse properties <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="dashboard-welcome-orb dashboard-welcome-orb-one" />
+        <div className="dashboard-welcome-orb dashboard-welcome-orb-two" />
+      </header>
+
+      {user?.role === "MANAGER" && pendingTenantRequestCount > 0 && (
+        <aside className="dashboard-request-alert">
+          <div className="dashboard-alert-symbol" aria-hidden="true">!</div>
+          <div className="dashboard-alert-copy">
+            <strong>{pendingTenantRequestCount} tenant request{pendingTenantRequestCount === 1 ? "" : "s"} need your attention</strong>
+            <span>Review pending stay requests for your properties.</span>
+          </div>
+          <Link className="dashboard-alert-link" to="/tenant-requests">
+            Review requests <span aria-hidden="true">→</span>
+          </Link>
+        </aside>
+      )}
+
+      <div className="dashboard-section-heading">
+        <div>
+          <span className="dashboard-eyebrow">AT A GLANCE</span>
+          <h2>Maintenance overview</h2>
+        </div>
+        <span className="dashboard-section-note">Current portfolio snapshot</span>
       </div>
 
-      {user?.role === "MANAGER" &&
-        pendingTenantRequestCount > 0 && (
-          <div
-            className="card"
-            style={{
-              marginBottom: "1.25rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "1rem",
-            }}
-          >
-            <div>
-              <h3 style={{ margin: 0 }}>Tenant stay requests</h3>
-
-              <p
-                className="page-header-subtitle"
-                style={{ marginBottom: 0 }}
-              >
-                {pendingTenantRequestCount} tenant request(s) are
-                waiting for your approval.
-              </p>
-            </div>
-
-            <Link className="btn btn-primary" to="/tenant-requests">
-              Review Requests
-            </Link>
-          </div>
-        )}
-
-      {/* KPI Overview */}
-      <div className="kpi-grid">
+      <div className="kpi-grid dashboard-kpi-grid">
         <KpiCard
           title="Total Requests"
           value={analytics.overview.totalRequests}
@@ -259,14 +261,28 @@ function DashboardPage() {
         />
       </div>
 
-      {/* Priority and Category */}
-      <div className="grid-2">
+      <div className="dashboard-section-heading dashboard-section-heading-spaced">
+        <div>
+          <span className="dashboard-eyebrow">REQUEST INSIGHTS</span>
+          <h2>Where attention is needed</h2>
+        </div>
+        <span className="dashboard-section-note">Priority & category distribution</span>
+      </div>
+
+      <div className="grid-2 dashboard-insight-grid">
         <PriorityBreakdown data={analytics.byPriority} />
         <CategroyBreakdown data={analytics.byCategory} />
       </div>
 
-      {/* Workload, Issues and Resolution */}
-      <div className="grid-3">
+      <div className="dashboard-section-heading dashboard-section-heading-spaced">
+        <div>
+          <span className="dashboard-eyebrow">TEAM & PORTFOLIO</span>
+          <h2>Operational performance</h2>
+        </div>
+        <span className="dashboard-section-note">Workload, property issues & resolution</span>
+      </div>
+
+      <div className="grid-3 dashboard-performance-grid">
         <TechnicianWorkLoad data={analytics.technicianWorkload} />
         <PropertyIssues data={analytics.propertyIssues} />
         <ResolutionMetric
@@ -275,7 +291,7 @@ function DashboardPage() {
           }
         />
       </div>
-    </div>
+    </section>
   );
 }
 
