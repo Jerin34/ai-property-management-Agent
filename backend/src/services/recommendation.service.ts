@@ -4,7 +4,7 @@ import { MAINTENANCE_STATUS } from '../constants/maintenance.js'
 import { TechnicianRecommendation } from '../types/technician.types.js'
 import { calculateDistance } from '../utils/distance.js'
 export const recommendTechnicians = async(category:string,priority:string,propertyLatitude:number,propertyLongitude:number):Promise<TechnicianRecommendation[]> =>{
-    const technicians = await User.find({role:'TECHNICIAN',skills:category,isActive:true});
+    const technicians = await User.find({role:'TECHNICIAN',skills:category,isActive:true,profileCompleted:true});
     const recommendations:TechnicianRecommendation[] = [];
     let bonus:number = 0; 
     if(priority === 'LOW'){
