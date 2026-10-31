@@ -275,3 +275,16 @@ export const updateTechnicianProfile = async (
     await technician.save();
     return technician;
 };
+
+
+export const getTechnicianApplicationStatus = async (userId: string) => {
+    const user = await User.findById(userId)
+        .select("role technicianApplicationStatus technicianApplicationRequestedAt technicianApprovedAt");
+    if (!user) throw new Error("User not found");
+    return {
+        role: user.role,
+        status: user.technicianApplicationStatus,
+        requestedAt: user.technicianApplicationRequestedAt,
+        approvedAt: user.technicianApprovedAt,
+    };
+};
