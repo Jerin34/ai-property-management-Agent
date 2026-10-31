@@ -22,8 +22,18 @@ export const NavigationItems: NavigationItem[] = [
     allowedRoles: ["TENANT"],
   },
   {
+    label: "Apply for Technician Role",
+    path: "/apply-for-technician",
+    allowedRoles: ["TENANT"],
+  },
+  {
     label: "Manager Applications",
     path: "/admin/role-approvals",
+    allowedRoles: ["ADMIN"],
+  },
+  {
+    label: "Technician Applications",
+    path: "/admin/technician-role-approvals",
     allowedRoles: ["ADMIN"],
   },
   {
@@ -54,6 +64,11 @@ export const NavigationItems: NavigationItem[] = [
   {
     label: "My Maintenance",
     path: "/technician/maintenance",
+    allowedRoles: ["TECHNICIAN"],
+  },
+  {
+    label: "Technician Profile",
+    path: "/technician/profile",
     allowedRoles: ["TECHNICIAN"],
   },
   {

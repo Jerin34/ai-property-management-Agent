@@ -295,6 +295,18 @@ if (user.role === ROLES.Technician) {
             return;
         }
 
+        if (
+            err instanceof Error &&
+            err.message === "Technician profile is incomplete"
+        ) {
+            res.status(409).json({
+                success: false,
+                code: "TECHNICIAN_PROFILE_INCOMPLETE",
+                message: "This Technician must complete their profile before receiving assignments.",
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: "Internal Server Error",

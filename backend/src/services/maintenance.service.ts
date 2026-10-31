@@ -88,6 +88,9 @@ export const assignTechnician= async(maintenanceId:string,techicianId:string) =>
     if(technician.role !==  ROLES.Technician){
         throw new Error("User is not a technician")
     }
+    if (!technician.profileCompleted) {
+        throw new Error("Technician profile is incomplete");
+    }
     maintenance.technician = technician._id
     maintenance.status = 'IN_PROGRESS'
     await maintenance.save();
