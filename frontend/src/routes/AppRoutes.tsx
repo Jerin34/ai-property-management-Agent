@@ -119,10 +119,6 @@ function AppRoutes() {
                 element={<CreateMaintenanceSchedulePage />}
               />
               <Route
-                path="/properties/:id"
-                element={<PropertyDetailsPage />}
-              />
-              <Route
                 path="/properties/:id/edit"
                 element={<EditPropertyPage />}
               />
