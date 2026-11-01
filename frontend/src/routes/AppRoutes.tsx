@@ -19,6 +19,7 @@ import MaintenanceCostAnalyticsPage from "../pages/MaintenanceCostAnalyticsPage.
 import MaintenanceSchedulerPage from "../pages/MaintenanceSchedulePage.tsx";
 import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePage.tsx";
 import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
+import EditPropertyPage from "../pages/EditPropertyPage.tsx";
 
 
 import AdminRoleApprovalsPage from "../pages/AdminRoleApprovalsPage.tsx";
@@ -103,6 +104,10 @@ function AppRoutes() {
               />
             </Route>
 
+            <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER", "TENANT"]} />}>
+              <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+            </Route>
+
             <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
               <Route path="/properties" element={<PropertiesPage />} />
               <Route
@@ -116,6 +121,10 @@ function AppRoutes() {
               <Route
                 path="/properties/:id"
                 element={<PropertyDetailsPage />}
+              />
+              <Route
+                path="/properties/:id/edit"
+                element={<EditPropertyPage />}
               />
             </Route>
           </Route>
