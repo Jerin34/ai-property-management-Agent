@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   browseProperties,
   getMyPropertyRequests,
@@ -11,6 +12,7 @@ import {
 } from "../api/property.api";
 
 function TenantPropertyPage() {
+  const navigate = useNavigate();
   const [properties, setProperties] = useState<BrowseProperty[]>([]);
   const [requests, setRequests] = useState<PropertyStayRequest[]>([]);
   const [assignments, setAssignments] = useState<TenantPropertyAssignment[]>([]);
@@ -198,6 +200,9 @@ useEffect(() => {
 
               return (
                 <div className="card" key={property._id}>
+                  {property.images?.[0] && (
+                    <img src={property.images[0]} alt={property.name} style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: "0.75rem", marginBottom: "0.75rem" }} />
+                  )}
                   <h3>{property.name}</h3>
 
                   <p>
@@ -208,6 +213,9 @@ useEffect(() => {
                     <p>{property.description}</p>
                   )}
 
+                  <button className="btn btn-outline btn-block" type="button" onClick={() => navigate(`/properties/${property._id}`)} style={{ marginBottom: "0.5rem" }}>
+                    View Property Details
+                  </button>
                   {existing && existing.status === "PENDING" ? (
                     <span className="badge badge-warning">
                       PENDING
