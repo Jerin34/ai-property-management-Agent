@@ -4,7 +4,7 @@ export const NavigationItems: NavigationItem[] = [
   {
     label: "Dashboard",
     path: "/dashboard",
-    allowedRoles: ["ADMIN", "MANAGER", "TECHNICIAN", "TENANT"],
+    allowedRoles: ["ADMIN", "MANAGER","TECHNICIAN","TENANT"],
   },
   {
     label: "Tenant Requests",
@@ -59,7 +59,7 @@ export const NavigationItems: NavigationItem[] = [
   {
     label: "Notifications",
     path: "/notification",
-    allowedRoles: ["ADMIN", "MANAGER", "TECHNICIAN", "TENANT"],
+    allowedRoles: ["ADMIN", "MANAGER",  "TENANT"],
   },
   {
     label: "My Maintenance",
