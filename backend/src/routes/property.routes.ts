@@ -6,6 +6,7 @@ import {ROLES} from '../constants/roles.js'
 import {createPropertySchema,updatePropertySchema} from  '../validator/property.validator.js'
 import * as propertyController from '../controllers/property.controller.js'
 import * as stayRequestController from '../controllers/property-stay-request.controller.js'
+import upload from '../middleware/upload.middleware.js'
 const router = Router()
 router.post("/",authenticate,autihorize(ROLES.Admin,ROLES.Manager),validate(createPropertySchema),propertyController.create)
 router.get("/browse", authenticate, autihorize(ROLES.Tenant), stayRequestController.browseProperties);
@@ -43,8 +44,15 @@ router.patch(
 router.get(
     "/:id",
     authenticate,
-    autihorize(ROLES.Admin, ROLES.Manager),
+    autihorize(ROLES.Admin, ROLES.Manager, ROLES.Tenant),
     propertyController.getPropertyById
+);
+router.post(
+    "/:id/images",
+    authenticate,
+    autihorize(ROLES.Admin, ROLES.Manager),
+    upload.array("images", 5),
+    propertyController.uploadPropertyImages
 );   
 router.get(
     "/:id/copilot",

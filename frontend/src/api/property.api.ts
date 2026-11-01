@@ -97,6 +97,7 @@ export const assignTenantToProperty = async (propertyId: string, tenantEmail: st
 
 export interface BrowseProperty extends AvailableProperty {
     description?: string;
+    images?: string[];
     manager?: { _id: string; name?: string; email?: string } | string;
 }
 export interface PropertyStayRequest {
@@ -133,5 +134,19 @@ export const reviewPropertyRequest = async (requestId: string, decision: "APPROV
 };
 export const getMyTenantAssignments = async (): Promise<TenantPropertyAssignment[]> => {
     const response = await apiClient.get<{ success: boolean; data: TenantPropertyAssignment[] }>("/properties/tenants/my");
+    return response.data.data;
+};
+
+export const uploadPropertyImages = async (propertyId: string, files: File[]): Promise<Property> => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+    const response = await apiClient.post<PropertiesResponse>(`/properties/${propertyId}/images`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data.data;
+};
+
+export const updateProperty = async (propertyId: string, data: Partial<CreatePropertyRequest>): Promise<Property> => {
+    const response = await apiClient.patch<PropertiesResponse>(`/properties/${propertyId}`, data);
     return response.data.data;
 };

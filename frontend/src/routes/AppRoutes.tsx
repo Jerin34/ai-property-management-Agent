@@ -19,6 +19,7 @@ import MaintenanceCostAnalyticsPage from "../pages/MaintenanceCostAnalyticsPage.
 import MaintenanceSchedulerPage from "../pages/MaintenanceSchedulePage.tsx";
 import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePage.tsx";
 import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
+import EditPropertyPage from "../pages/EditPropertyPage.tsx";
 
 import AdminRoleApprovalsPage from "../pages/AdminRoleApprovalsPage.tsx";
 import ApplyForTechnicianRolePage from "../pages/ApplyForTechnicianRolePage.tsx";
@@ -114,6 +115,10 @@ function AppRoutes() {
               />
             </Route>
 
+            <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER", "TENANT"]} />}>
+              <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+            </Route>
+
             <Route element={<RoleRoute allowedRoles={["ADMIN", "MANAGER"]} />}>
               <Route path="/properties" element={<PropertiesPage />} />
               <Route
@@ -124,12 +129,19 @@ function AppRoutes() {
                 path="/maintenance/schedules/create"
                 element={<CreateMaintenanceSchedulePage />}
               />
+
+              <Route
+                path="/properties/:id/edit"
+                element={<EditPropertyPage />}
+              />
+
               <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+
             </Route>
           </Route>
         </Route>
 
-        {/* Keep the fallback outside protected routes so unknown URLs render 404. */}
+     
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

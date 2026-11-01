@@ -15,6 +15,7 @@ export interface Property{
         address:PropertyAddress;
         manager:string;
         description?:string;
+        images?: string[];
         isActive:boolean;
         location:PropertyLocation;
         createdAt:Date;

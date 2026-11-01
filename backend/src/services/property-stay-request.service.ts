@@ -7,28 +7,22 @@ import { ROLES } from "../constants/roles.js";
 
 export const browseActiveProperties = async () => {
     return Property.find({ isActive: true })
-        .select("_id name address description manager")
-        .populate("manager", "name email")
+        .select("_id name address description images location isActive")
         .sort({ name: 1 });
 };
 
 export const createPropertyStayRequest = async (tenantId: string, propertyId: string) => {
     if (!mongoose.isValidObjectId(propertyId)) throw new Error("Property not found");
-
     const [property, tenant, activeAssignment, pendingRequest] = await Promise.all([
         Property.findOne({ _id: propertyId, isActive: true }),
         User.findById(tenantId),
         TenantPropertyAssignment.findOne({ tenant: tenantId, status: "ACTIVE" }),
         PropertyStayRequest.findOne({ tenant: tenantId, status: "PENDING" }),
     ]);
-
     if (!property) throw new Error("Property not found or inactive");
-    if (!tenant || tenant.role !== ROLES.Tenant || !tenant.isActive) {
-        throw new Error("An active tenant account is required");
-    }
+    if (!tenant || tenant.role !== ROLES.Tenant || !tenant.isActive) throw new Error("An active tenant account is required");
     if (activeAssignment) throw new Error("You already have an assigned property");
     if (pendingRequest) throw new Error("You already have a pending request for this property");
-
     return PropertyStayRequest.create({ tenant: tenantId, property: propertyId, status: "PENDING" });
 };
 
@@ -37,7 +31,6 @@ export const getTenantStayRequests = async (tenantId: string) => {
         .populate("property", "name address")
         .sort({ createdAt: -1 });
 };
-
 export const getManagerStayRequests = async (managerId: string) => {
     const properties = await Property.find({ manager: managerId }).select("_id");
     const propertyIds = properties.map((property) => property._id);
@@ -46,29 +39,21 @@ export const getManagerStayRequests = async (managerId: string) => {
         .populate("property", "name address")
         .sort({ createdAt: 1 });
 };
-
 export const reviewPropertyStayRequest = async (
     requestId: string,
     managerId: string,
-    decision: "APPROVE" | "REJECT"
+    decision: "APPROVE" | "REJECT",
 ) => {
     if (!mongoose.isValidObjectId(requestId)) throw new Error("Request not found");
-
     const request = await PropertyStayRequest.findById(requestId).populate("property");
     if (!request) throw new Error("Request not found");
-
     const property = request.property as unknown as { _id: mongoose.Types.ObjectId; manager: mongoose.Types.ObjectId; isActive: boolean };
     if (property.manager.toString() !== managerId) throw new Error("You cannot review requests for this property");
     if (request.status !== "PENDING") throw new Error("This request has already been reviewed");
     if (!property.isActive) throw new Error("Property is inactive");
-
     if (decision === "APPROVE") {
-        const existingAssignment = await TenantPropertyAssignment.findOne({
-            tenant: request.tenant,
-            status: "ACTIVE",
-        });
+        const existingAssignment = await TenantPropertyAssignment.findOne({ tenant: request.tenant, status: "ACTIVE" });
         if (existingAssignment) throw new Error("Tenant already has an assigned property");
-
         await TenantPropertyAssignment.create({
             tenant: request.tenant,
             property: property._id,
@@ -77,7 +62,6 @@ export const reviewPropertyStayRequest = async (
             startDate: new Date(),
         });
     }
-
     request.status = decision === "APPROVE" ? "APPROVED" : "REJECTED";
     request.reviewedBy = new mongoose.Types.ObjectId(managerId);
     request.reviewedAt = new Date();
