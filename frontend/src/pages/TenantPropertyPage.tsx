@@ -146,108 +146,51 @@ useEffect(() => {
       )}
 
       {assignedProperties.length > 0 ? (
-        <div className="card">
-          <span className="badge badge-completed">
-            Approved · Your assigned property
-          </span>
-
+        <div className="card" style={{ marginBottom: "1.25rem" }}>
+          <span className="badge badge-completed">Approved · Your assigned property</span>
           {assignedProperties.map((property) => (
             <div key={property._id}>
               <h2>{property.name}</h2>
-              <p>
-                {property.address?.street}, {property.address?.city}
-              </p>
+              <p>{property.address?.street}, {property.address?.city}</p>
+              <button type="button" className="btn btn-outline" onClick={() => navigate(`/properties/${property._id}`)}>View assigned property</button>
             </div>
           ))}
-
-          <p className="page-header-subtitle">
-            Your manager approved your stay. You can now submit
-            maintenance requests for this property.
-          </p>
+          <p className="page-header-subtitle">Your manager approved your stay. You can now submit maintenance requests for this property.</p>
         </div>
       ) : (
-        <>
-          <div className="card" style={{ marginBottom: "1rem" }}>
-            <h3>
-              {activeRequest
-                ? "Your request is waiting for manager approval"
-                : "You don't have an assigned property yet"}
-            </h3>
-
-            <p className="page-header-subtitle">
-              {activeRequest
-                ? "You can track your request below. The property will appear here after approval."
-                : "Browse properties below and send a request to the property manager."}
-            </p>
-
-            {activeRequest && (
-              <span className="badge badge-warning">
-                Request pending
-              </span>
-            )}
-          </div>
-
-          <h2>Available Properties</h2>
-
-          <div className="grid-cards">
-            {properties.map((property) => {
-              const existing = requests.find(
-                (r) =>
-                  (typeof r.property === "string"
-                    ? r.property
-                    : r.property._id) === property._id
-              );
-
-              return (
-                <div className="card" key={property._id}>
-                  {property.images?.[0] && (
-                    <img src={property.images[0]} alt={property.name} style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: "0.75rem", marginBottom: "0.75rem" }} />
-                  )}
-                  <h3>{property.name}</h3>
-
-                  <p>
-                    {property.address.street}, {property.address.city}
-                  </p>
-
-                  {property.description && (
-                    <p>{property.description}</p>
-                  )}
-
-                  <button className="btn btn-outline btn-block" type="button" onClick={() => navigate(`/properties/${property._id}`)} style={{ marginBottom: "0.5rem" }}>
-                    View Property Details
-                  </button>
-                  {existing && existing.status === "PENDING" ? (
-                    <span className="badge badge-warning">
-                      PENDING
-                    </span>
-                  ) : (
-                    <button
-                      className="btn btn-primary"
-                      disabled={
-                        !!activeRequest ||
-                        assignments.length > 0 ||
-                        !!busyId
-                      }
-                      onClick={() => void handleRequest(property._id)}
-                    >
-                      {busyId === property._id
-                        ? "Sending..."
-                        : "Request to Stay"}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {properties.length === 0 && (
-            <div className="empty-state">
-              <h3>No active properties available</h3>
-              <p>Please contact a property manager.</p>
-            </div>
-          )}
-        </>
+        <div className="card" style={{ marginBottom: "1.25rem" }}>
+          <h3>{activeRequest ? "Your request is waiting for manager approval" : "You don't have an assigned property yet"}</h3>
+          <p className="page-header-subtitle">{activeRequest ? "You can track your request below. The property will appear here after approval." : "Browse active properties, review their details and images, then send a request to stay."}</p>
+          {activeRequest && <span className="badge badge-warning">Request pending</span>}
+        </div>
       )}
+
+      <h2>Browse Active Properties</h2>
+      <p className="page-header-subtitle">View property details and images before requesting to stay.</p>
+      <div className="grid-cards">
+        {properties.map((property) => {
+          const existing = requests.find((r) =>
+            (typeof r.property === "string" ? r.property : r.property._id) === property._id
+          );
+          return (
+            <div className="card" key={property._id}>
+              {property.images?.[0] && <img src={property.images[0]} alt={property.name} loading="lazy" style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: "0.75rem", marginBottom: "0.75rem" }} />}
+              <h3>{property.name}</h3>
+              <p>{property.address.street}, {property.address.city}</p>
+              {property.description && <p>{property.description}</p>}
+              <button type="button" className="btn btn-outline btn-block" onClick={() => navigate(`/properties/${property._id}`)} style={{ marginBottom: "0.5rem" }}>View Property Details</button>
+              {existing?.status === "PENDING" ? (
+                <span className="badge badge-warning">PENDING</span>
+              ) : (
+                <button className="btn btn-primary btn-block" disabled={!!activeRequest || assignments.length > 0 || !!busyId} onClick={() => void handleRequest(property._id)}>
+                  {busyId === property._id ? "Sending..." : "Request to Stay"}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {properties.length === 0 && <div className="empty-state"><h3>No active properties available</h3><p>Please contact a property manager.</p></div>}
 
       {requests.some((r) => r.status === "REJECTED") && (
         <section style={{ marginTop: "1.5rem" }}>
