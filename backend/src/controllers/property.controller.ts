@@ -1,5 +1,6 @@
 import type {Request,Response} from 'express';
-import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService,getAvailableProperties,acitivateProperty as activatePropertyService} from '../services/property.service.js';
+import { createProperty, getMyProperties,getPropertyByid as getPropertyByIdService,updateProperty as updatePropertyService,deactivateProperty as deactivatePropertyService,getAvailableProperties,acitivateProperty as activatePropertyService, appendPropertyImages } from '../services/property.service.js';
+import uploadImage from '../services/upload.service.js';
 import { PropertyHealthService } from '../services/property-health.services.js'
 import {ROLES} from '../constants/roles.js'
 import { ManagerCopilotService } from '../services/manager-copilot.services.js';
@@ -68,6 +69,15 @@ export const getPropertyById = async(req:Request,res:Response):Promise<void> =>{
         }
         const propertyid = req.params.id.toString();
         const property = await getPropertyByIdService(propertyid)
+    if (user.role === ROLES.Tenant) {
+        if (!property.isActive) {
+            res.status(404).json({ success: false, message: "Property not found" });
+            return;
+        }
+        const { _id, name, address, description, images, location, isActive } = property;
+        res.status(200).json({ success: true, data: { _id, name, address, description, images, location, isActive } });
+        return;
+    }
     if(user.role === ROLES.Admin){
         res.status(200).json({success:true,data:property})
         return;
@@ -98,6 +108,33 @@ export const getPropertyById = async(req:Request,res:Response):Promise<void> =>{
         })
     }
 }
+export const uploadPropertyImages = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ success: false, message: "Authentication required" });
+            return;
+        }
+        const propertyId = String(req.params.id);
+        const property = await getPropertyByIdService(propertyId);
+        if (user.role !== ROLES.Admin && property.manager.toString() !== user.userId) {
+            res.status(403).json({ success: false, message: "You cannot upload images for this property" });
+            return;
+        }
+        const files = (req.files ?? []) as Express.Multer.File[];
+        if (files.length === 0) {
+            res.status(400).json({ success: false, message: "Select at least one image" });
+            return;
+        }
+        const uploaded = await Promise.all(files.map((file) => uploadImage(file.buffer)));
+        const updated = await appendPropertyImages(propertyId, uploaded.map((image) => image.secure_url));
+        res.status(200).json({ success: true, message: "Property images uploaded successfully", data: updated });
+    } catch (error) {
+        console.error("Property image upload failed:", error);
+        res.status(500).json({ success: false, message: "Failed to upload property images" });
+    }
+};
+
 export const getAvailablePropertiesList = async (
     req: Request,
     res: Response
