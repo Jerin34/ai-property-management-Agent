@@ -21,7 +21,6 @@ import CreateMaintenanceSchedulePage from "../pages/CreateMaintenanceSchedulePag
 import CreatePropertyPage from "../pages/CreatePropertyPage.tsx";
 import EditPropertyPage from "../pages/EditPropertyPage.tsx";
 
-
 import AdminRoleApprovalsPage from "../pages/AdminRoleApprovalsPage.tsx";
 import ApplyForTechnicianRolePage from "../pages/ApplyForTechnicianRolePage.tsx";
 import AdminTechnicianRoleApprovalsPage from "../pages/AdminTechnicianRoleApprovalsPage.tsx";
@@ -65,7 +64,13 @@ function AppRoutes() {
             </Route>
 
             <Route path="/maintenance" element={<MaintenancePage />} />
-            <Route path="/notification" element={<NotificationPage />} />
+            <Route
+              element={
+                <RoleRoute allowedRoles={["ADMIN", "MANAGER", "TENANT"]} />
+              }
+            >
+              <Route path="/notification" element={<NotificationPage />} />
+            </Route>
 
             <Route element={<RoleRoute allowedRoles={["TENANT"]} />}>
               <Route
@@ -77,7 +82,10 @@ function AppRoutes() {
                 path="/apply-for-manager"
                 element={<ApplyForManagerPage />}
               />
-              <Route path="apply-for-technician" element={<ApplyForTechnicianRolePage />} />
+              <Route
+                path="apply-for-technician"
+                element={<ApplyForTechnicianRolePage />}
+              />
             </Route>
 
             <Route
@@ -90,7 +98,10 @@ function AppRoutes() {
                 path="/technician/maintenance"
                 element={<TechnicianMaintenancePage />}
               />
-              <Route path="/technician/profile" element={<TechnicianProfilePage />} />
+              <Route
+                path="/technician/profile"
+                element={<TechnicianProfilePage />}
+              />
             </Route>
 
             <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
@@ -118,15 +129,19 @@ function AppRoutes() {
                 path="/maintenance/schedules/create"
                 element={<CreateMaintenanceSchedulePage />}
               />
+
               <Route
                 path="/properties/:id/edit"
                 element={<EditPropertyPage />}
               />
+
+              <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+
             </Route>
           </Route>
         </Route>
 
-        {/* Keep the fallback outside protected routes so unknown URLs render 404. */}
+     
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

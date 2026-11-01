@@ -28,7 +28,11 @@ function RegisterPage() {
       setPassword("");
       setPhone("");
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Registration failed. Please try again.");
+        if (error instanceof Error && error.message === "Request failed with status code 400") {
+    setErrorMessage("Email already exists. Please log in instead.");
+  } else {
+    setErrorMessage(error instanceof Error ? error.message : "Registration failed. Please try again.");
+  }
     } finally {
       setIsLoading(false);
     }
