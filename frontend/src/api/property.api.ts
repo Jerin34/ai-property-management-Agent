@@ -135,3 +135,12 @@ export const getMyTenantAssignments = async (): Promise<TenantPropertyAssignment
     const response = await apiClient.get<{ success: boolean; data: TenantPropertyAssignment[] }>("/properties/tenants/my");
     return response.data.data;
 };
+
+export const uploadPropertyImages = async (propertyId: string, files: File[]): Promise<Property> => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+    const response = await apiClient.post<PropertiesResponse>(`/properties/${propertyId}/images`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data.data;
+};
