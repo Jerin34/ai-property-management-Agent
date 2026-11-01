@@ -97,6 +97,7 @@ export const assignTenantToProperty = async (propertyId: string, tenantEmail: st
 
 export interface BrowseProperty extends AvailableProperty {
     description?: string;
+    images?: string[];
     manager?: { _id: string; name?: string; email?: string } | string;
 }
 export interface PropertyStayRequest {
@@ -142,5 +143,10 @@ export const uploadPropertyImages = async (propertyId: string, files: File[]): P
     const response = await apiClient.post<PropertiesResponse>(`/properties/${propertyId}/images`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });
+    return response.data.data;
+};
+
+export const updateProperty = async (propertyId: string, data: Partial<CreatePropertyRequest>): Promise<Property> => {
+    const response = await apiClient.patch<PropertiesResponse>(`/properties/${propertyId}`, data);
     return response.data.data;
 };
