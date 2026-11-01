@@ -27,35 +27,65 @@ function PropertyDetailsPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
 
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      if (!id) return;
-      try {
-        setIsLoading(true);
-        setError(null);
-        const propertyData = await getPropertyById(id);
-        if (!active) return;
-        setProperty(propertyData);
-        if (!isTenant) {
+ useEffect(() => {
+  let active = true;
+
+  const load = async () => {
+    if (!id) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const propertyData = await getPropertyById(id);
+
+      if (!active) return;
+
+      setProperty(propertyData);
+
+      if (!isTenant) {
+        setIsCopilotLoading(true);
+
+        try {
           const [healthData, copilotData] = await Promise.allSettled([
             getPropertiesHealth(id),
             getPropertyCopilot(id),
           ]);
+
           if (!active) return;
-          if (healthData.status === "fulfilled") setHealth(healthData.value);
-          if (copilotData.status === "fulfilled") setCopilot(copilotData.value);
+
+          if (healthData.status === "fulfilled") {
+            setHealth(healthData.value);
+          }
+
+          if (copilotData.status === "fulfilled") {
+            setCopilot(copilotData.value);
+          }
+        } finally {
+          if (active) {
+            setIsCopilotLoading(false);
+          }
         }
-      } catch (err) {
-        console.error("Failed to fetch property:", err);
-        if (active) setError("Failed to load property. You may not have access to it.");
-      } finally {
-        if (active) setIsLoading(false);
       }
-    };
-    void load();
-    return () => { active = false; };
-  }, [id, isTenant]);
+    } catch (err) {
+      console.error("Failed to fetch property:", err);
+
+      if (active) {
+        setError("Failed to load property. You may not have access to it.");
+      }
+    } finally {
+      if (active) {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  void load();
+
+  return () => {
+    active = false;
+  };
+}, [id, isTenant]);
 
   const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
@@ -63,6 +93,7 @@ function PropertyDetailsPage() {
     try {
       setUploading(true);
       setUploadError("");
+     
       const updated = await uploadPropertyImages(id, files);
       setProperty(updated);
       event.target.value = "";
